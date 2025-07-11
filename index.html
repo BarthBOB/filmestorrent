@@ -609,6 +609,14 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
+        // Garante que o modal esteja oculto imediatamente ao carregar o script
+        document.addEventListener('DOMContentLoaded', () => {
+            const movieModal = document.getElementById('movie-modal');
+            if (movieModal) {
+                movieModal.style.display = 'none';
+            }
+        });
+
         let moviesData = []; // Todos os dados do CSV
         let groupedMovies = {}; // Filmes agrupados por título principal
         let filteredMovieTitles = []; // Títulos de filmes após filtros e busca
