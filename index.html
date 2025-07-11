@@ -118,9 +118,15 @@
         /* Grid de filmes */
         .movies-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 4 colunas em telas maiores, ajusta para 8 por linha */
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Ajuste para telas menores */
             gap: 2rem;
             margin: 2rem 0;
+        }
+
+        @media (min-width: 1200px) { /* Para telas maiores, tenta 8 colunas */
+            .movies-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
         }
 
         /* Card do filme */
@@ -705,6 +711,11 @@
                 // Inicializa os títulos filtrados com todos os filmes únicos
                 filteredMovieTitles = Object.keys(groupedMovies);
                 
+                console.log('--- Dados Carregados ---');
+                console.log('moviesData length:', moviesData.length);
+                console.log('Número de títulos de filmes únicos (groupedMovies):', Object.keys(groupedMovies).length);
+                console.log('filteredMovieTitles inicial length:', filteredMovieTitles.length);
+
                 populateFilters(); // Preenche os filtros de resolução, formato e áudio
                 filterAndDisplayMovies(); // Aplica filtros e exibe a primeira página
                 
@@ -745,6 +756,9 @@
         function displayMovies() {
             moviesContainer.innerHTML = ''; // Limpa o container de filmes
             
+            console.log('--- Exibindo Filmes ---');
+            console.log('filteredMovieTitles length ao exibir:', filteredMovieTitles.length);
+
             if (filteredMovieTitles.length === 0) {
                 noResultsDiv.style.display = 'block';
                 moviesContainer.style.display = 'none';
@@ -761,6 +775,9 @@
             const startIndex = (currentPage - 1) * moviesPerPage;
             const endIndex = startIndex + moviesPerPage;
             const moviesToDisplay = filteredMovieTitles.slice(startIndex, endIndex);
+
+            console.log('moviesToDisplay length:', moviesToDisplay.length);
+            console.log('moviesToDisplay (primeiros 5):', moviesToDisplay.slice(0, 5));
 
             moviesToDisplay.forEach(title => {
                 const movieVersions = groupedMovies[title];
@@ -850,6 +867,45 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Função principal para filtrar e exibir filmes (inclui paginação)
+        function filterAndDisplayMovies() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const resolutionValue = resolutionFilter.value;
+            const formatValue = formatFilter.value;
+            const audioValue = audioFilter.value;
+
+            // Filtra os títulos únicos de filmes com base nos critérios
+            filteredMovieTitles = Object.keys(groupedMovies).filter(title => {
+                const versions = groupedMovies[title];
+                
+                // Verifica se o título ou sinopse contém o termo de busca
+                const matchesSearch = title.toLowerCase().includes(searchTerm) ||
+                                     versions.some(v => v.Sinopse && v.Sinopse.toLowerCase().includes(searchTerm));
+                
+                // Verifica se pelo menos uma versão do filme atende aos filtros selecionados
+                const matchesFilters = versions.some(version => {
+                    const matchesResolution = !resolutionValue || version.Resolução === resolutionValue;
+                    const matchesFormat = !formatValue || version.Formato === formatValue;
+                    const matchesAudio = !audioValue || version.Áudio === audioValue;
+                    
+                    return matchesResolution && matchesFormat && matchesAudio;
+                });
+
+                return matchesSearch && matchesFilters;
+            });
+
+            console.log('--- Filtros Aplicados ---');
+            console.log('Termo de busca:', searchTerm);
+            console.log('Resolução selecionada:', resolutionValue);
+            console.log('Formato selecionado:', formatValue);
+            console.log('Áudio selecionado:', audioValue);
+            console.log('filteredMovieTitles length após filtrar:', filteredMovieTitles.length);
+            console.log('filteredMovieTitles (primeiros 5):', filteredMovieTitles.slice(0, 5));
+
+            currentPage = 1; // Reseta para a primeira página ao aplicar novos filtros ou busca
+            displayMovies(); // Exibe os filmes da página atual
         }
 
         // Atualizar estatísticas (total de filmes, filmes exibidos e info de paginação)
