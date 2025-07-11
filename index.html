@@ -541,54 +541,80 @@
                         .trim();
         }
 
-        // Carregar dados do CSV
+        // Carregar dados dos CSVs
         async function loadMovies() {
             try {
-                const response = await fetch('starckfilmes_catalogo.csv');
-                const csvText = await response.text();
-                
-                Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        moviesData = results.data;
-                        
-                        // Agrupar filmes por título principal
-                        groupedMovies = {};
-                        moviesData.forEach(movie => {
-                            const cleanedTitle = cleanTitle(movie.Título);
-                            if (!groupedMovies[cleanedTitle]) {
-                                groupedMovies[cleanedTitle] = [];
-                            }
-                            groupedMovies[cleanedTitle].push(movie);
-                        });
+                // Fetch both CSV files concurrently
+                const [response1, response2] = await Promise.all([
+                    fetch('starckfilmes_parte1.csv'),
+                    fetch('starckfilmes_parte2.csv')
+                ]);
 
-                        // Ordenar versões dentro de cada grupo (ex: 4K, 1080p, 720p)
-                        Object.keys(groupedMovies).forEach(title => {
-                            groupedMovies[title].sort((a, b) => {
-                                const resolutionOrder = { '4K': 4, '2160p': 4, '1080p': 3, '720p': 2, '480p': 1 };
-                                return (resolutionOrder[b.Resolução] || 0) - (resolutionOrder[a.Resolução] || 0);
-                            });
-                        });
+                const csvText1 = await response1.text();
+                const csvText2 = await response2.text();
 
-                        // Inicializa os títulos filtrados com todos os filmes únicos
-                        filteredMovieTitles = Object.keys(groupedMovies);
-                        
-                        populateFilters(); // Preenche os filtros de resolução, formato e áudio
-                        filterAndDisplayMovies(); // Aplica filtros e exibe a primeira página
-                        
-                        loadingDiv.style.display = 'none';
-                        moviesContainer.style.display = 'grid';
-                        paginationControls.style.display = 'flex'; // Mostra os controles de paginação
-                    },
-                    error: function(error) {
-                        console.error('Erro ao carregar CSV:', error);
-                        loadingDiv.innerHTML = '❌ Erro ao carregar os dados. Verifique se o arquivo starckfilmes_catalogo.csv está no diretório.';
-                    }
+                // Parse both CSVs
+                const parsePromise1 = new Promise((resolve, reject) => {
+                    Papa.parse(csvText1, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            resolve(results.data);
+                        },
+                        error: function(error) {
+                            reject(error);
+                        }
+                    });
                 });
+
+                const parsePromise2 = new Promise((resolve, reject) => {
+                    Papa.parse(csvText2, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            resolve(results.data);
+                        },
+                        error: function(error) {
+                            reject(error);
+                        }
+                    });
+                });
+
+                const [data1, data2] = await Promise.all([parsePromise1, parsePromise2]);
+                
+                // Combine data from both CSVs
+                moviesData = [...data1, ...data2];
+                
+                // Agrupar filmes por título principal
+                groupedMovies = {};
+                moviesData.forEach(movie => {
+                    const cleanedTitle = cleanTitle(movie.Título);
+                    if (!groupedMovies[cleanedTitle]) {
+                        groupedMovies[cleanedTitle] = [];
+                    }
+                    groupedMovies[cleanedTitle].push(movie);
+                });
+
+                // Ordenar versões dentro de cada grupo (ex: 4K, 1080p, 720p)
+                Object.keys(groupedMovies).forEach(title => {
+                    groupedMovies[title].sort((a, b) => {
+                        const resolutionOrder = { '4K': 4, '2160p': 4, '1080p': 3, '720p': 2, '480p': 1 };
+                        return (resolutionOrder[b.Resolução] || 0) - (resolutionOrder[a.Resolução] || 0);
+                    });
+                });
+
+                // Inicializa os títulos filtrados com todos os filmes únicos
+                filteredMovieTitles = Object.keys(groupedMovies);
+                
+                populateFilters(); // Preenche os filtros de resolução, formato e áudio
+                filterAndDisplayMovies(); // Aplica filtros e exibe a primeira página
+                
+                loadingDiv.style.display = 'none';
+                moviesContainer.style.display = 'grid';
+                paginationControls.style.display = 'flex'; // Mostra os controles de paginação
             } catch (error) {
-                console.error('Erro ao buscar arquivo:', error);
-                loadingDiv.innerHTML = '❌ Erro ao carregar os dados. Verifique se o arquivo starckfilmes_catalogo.csv está no diretório.';
+                console.error('Erro ao carregar CSVs:', error);
+                loadingDiv.innerHTML = '❌ Erro ao carregar os dados. Verifique se os arquivos CSV estão no diretório.';
             }
         }
 
