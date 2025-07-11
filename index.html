@@ -13,7 +13,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif; /* Usando Inter como solicitado */
             background: linear-gradient(135deg, #0c1022 0%, #1a1a2e 50%, #16213e 100%);
             color: #ffffff;
             min-height: 100vh;
@@ -118,8 +118,7 @@
         /* Grid de filmes */
         .movies-grid {
             display: grid;
-            /* Ajustado para 32 filmes por página, a largura mínima de cada card foi ajustada */
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 4 colunas em telas maiores, ajusta para 8 por linha */
             gap: 2rem;
             margin: 2rem 0;
         }
@@ -133,8 +132,11 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
             position: relative;
-            display: flex; /* Adicionado para layout flexível interno */
-            flex-direction: column; /* Conteúdo em coluna */
+            display: flex;
+            flex-direction: column;
+            cursor: pointer; /* Indica que é clicável */
+            text-align: center; /* Centraliza o título */
+            padding-bottom: 1rem; /* Espaçamento abaixo do título */
         }
 
         .movie-card:hover {
@@ -146,8 +148,7 @@
         /* Poster do filme - Formato DVD */
         .movie-poster {
             width: 100%;
-            /* Proporção 1:1.4 (largura para altura) para capa de DVD */
-            padding-bottom: 140%; /* 100% / (largura/altura) = 100% / (1/1.4) = 140% */
+            padding-bottom: 140%; /* Proporção 1:1.4 (largura para altura) para capa de DVD */
             position: relative;
             background: linear-gradient(45deg, #2c3e50, #3498db);
             display: flex;
@@ -156,6 +157,7 @@
             font-size: 4rem;
             color: rgba(255, 255, 255, 0.3);
             overflow: hidden;
+            margin-bottom: 0.5rem; /* Espaçamento entre poster e título */
         }
 
         .movie-poster img {
@@ -164,7 +166,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Garante que a imagem cubra o espaço mantendo a proporção */
+            object-fit: cover;
             transition: transform 0.3s ease;
         }
 
@@ -185,59 +187,129 @@
             z-index: 10;
         }
 
-        .movie-info {
-            padding: 1.5rem;
-            flex-grow: 1; /* Permite que o info ocupe o espaço restante */
-            display: flex;
-            flex-direction: column;
-        }
-
         .movie-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            margin-bottom: 0.5rem;
             color: #ffffff;
             line-height: 1.3;
+            padding: 0 0.5rem; /* Adicionado padding para o título */
         }
 
-        .movie-details {
+        /* Modal de Detalhes do Filme */
+        .movie-modal {
+            display: none; /* Oculto por padrão */
+            position: fixed; /* Fixo na tela */
+            z-index: 1000; /* Acima de tudo */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Permite scroll se o conteúdo for grande */
+            background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro semi-transparente */
+            backdrop-filter: blur(5px); /* Efeito de blur no fundo */
             display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            align-items: center;
+            justify-content: center;
         }
 
-        .detail-tag {
-            background: rgba(78, 205, 196, 0.2);
-            color: #4ecdc4;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            margin: auto;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            max-height: 90vh; /* Limita a altura do modal */
+            overflow-y: auto; /* Adiciona scroll interno se necessário */
         }
 
-        .movie-synopsis {
-            font-size: 0.9rem;
-            color: #a0a0a0;
-            line-height: 1.4;
-            margin-bottom: 1rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #ff6b6b;
+            text-decoration: none;
+        }
+
+        .modal-movie-details {
+            display: flex;
+            flex-wrap: wrap; /* Permite quebrar em linha em telas menores */
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .modal-poster {
+            flex: 0 0 250px; /* Largura fixa para o poster no modal */
+            height: 350px; /* Altura fixa para o poster no modal */
+            position: relative;
+            border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .versions-section {
+        .modal-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-info {
+            flex: 1;
+            min-width: 300px; /* Garante que o info não fique muito pequeno */
+        }
+
+        .modal-info h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #4ecdc4, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-info .movie-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-info .movie-synopsis {
+            font-size: 1rem;
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            display: block; /* Garante que a sinopse seja totalmente visível no modal */
+            -webkit-line-clamp: unset; /* Remove o limite de linhas */
+        }
+
+        .modal-info .versions-section {
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 1rem;
-            margin-top: auto; /* Empurra para o final do card */
         }
 
+        /* Estilos para as versões dentro do modal (reutilizando existentes) */
         .version-item {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             padding: 0.8rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
             transition: all 0.3s ease;
         }
 
@@ -308,36 +380,6 @@
 
         .download-btn.secondary:hover {
             box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
-        }
-
-        .expand-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #4ecdc4;
-            border: 1px solid rgba(78, 205, 196, 0.3);
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-
-        .expand-btn:hover {
-            background: rgba(78, 205, 196, 0.1);
-        }
-
-        .versions-expanded {
-            max-height: 1000px; /* Valor alto para permitir expansão */
-            opacity: 1;
-            transition: all 0.3s ease;
-        }
-
-        .versions-collapsed {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
         }
 
         /* Estados de carregamento e sem resultados */
@@ -439,11 +481,31 @@
             }
 
             .movies-grid {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Ajuste para telas menores */
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Ajuste para telas menores */
             }
 
             .movie-poster {
                 padding-bottom: 140%; /* Mantém a proporção de DVD */
+            }
+
+            .modal-movie-details {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .modal-poster {
+                width: 100%;
+                max-width: 200px; /* Limita a largura do poster em telas pequenas */
+                height: auto;
+            }
+
+            .modal-info h2 {
+                font-size: 1.5rem;
+                text-align: center;
+            }
+
+            .modal-info .movie-synopsis {
+                text-align: center;
             }
 
             .version-info {
@@ -460,6 +522,14 @@
         @media (max-width: 480px) {
             .movies-grid {
                 grid-template-columns: 1fr; /* Uma coluna em telas muito pequenas */
+            }
+            .modal-content {
+                padding: 1rem;
+            }
+            .close-button {
+                top: 10px;
+                right: 15px;
+                font-size: 24px;
             }
         }
     </style>
@@ -513,13 +583,31 @@
         </div>
     </div>
 
+    <!-- Modal de Detalhes do Filme -->
+    <div id="movie-modal" class="movie-modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="modal-movie-details">
+                <div class="modal-poster">
+                    <img id="modal-poster-img" src="" alt="Poster do Filme">
+                </div>
+                <div class="modal-info">
+                    <h2 id="modal-title"></h2>
+                    <div id="modal-details" class="movie-details"></div>
+                    <p id="modal-synopsis" class="movie-synopsis"></p>
+                    <div id="modal-versions" class="versions-section"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
         let moviesData = []; // Todos os dados do CSV
         let groupedMovies = {}; // Filmes agrupados por título principal
         let filteredMovieTitles = []; // Títulos de filmes após filtros e busca
         let currentPage = 1; // Página atual da paginação
-        const moviesPerPage = 32; // Número de filmes por página
+        const moviesPerPage = 32; // Número de filmes por página (4 fileiras de 8)
 
         // Elementos do DOM
         const searchInput = document.getElementById('search-input');
@@ -533,6 +621,15 @@
         const filteredMoviesSpan = document.getElementById('filtered-movies');
         const paginationInfoSpan = document.getElementById('pagination-info');
         const paginationControls = document.getElementById('pagination-controls');
+
+        // Elementos do Modal
+        const movieModal = document.getElementById('movie-modal');
+        const closeButton = document.querySelector('.close-button');
+        const modalTitle = document.getElementById('modal-title');
+        const modalPosterImg = document.getElementById('modal-poster-img');
+        const modalDetails = document.getElementById('modal-details');
+        const modalSynopsis = document.getElementById('modal-synopsis');
+        const modalVersions = document.getElementById('modal-versions');
 
         // Função para limpar o título e extrair nome principal (removendo "Torrent" e similares)
         function cleanTitle(title) {
@@ -562,6 +659,7 @@
                             resolve(results.data);
                         },
                         error: function(error) {
+                            console.error('Erro ao parsear starckfilmes_parte1.csv:', error);
                             reject(error);
                         }
                     });
@@ -575,6 +673,7 @@
                             resolve(results.data);
                         },
                         error: function(error) {
+                            console.error('Erro ao parsear starckfilmes_parte2.csv:', error);
                             reject(error);
                         }
                     });
@@ -673,13 +772,14 @@
             renderPagination(); // Renderiza os controles de paginação
         }
 
-        // Criar card do filme
+        // Criar card do filme (apenas capa e título)
         function createMovieCard(title, versions) {
             const primaryVersion = versions[0];
             const hasMultipleVersions = versions.length > 1;
             
             const card = document.createElement('div');
             card.className = 'movie-card';
+            card.dataset.title = title; // Armazena o título para fácil acesso ao clicar
 
             const posterUrl = primaryVersion['Poster Página'];
 
@@ -688,70 +788,50 @@
                     ${hasMultipleVersions ? `<div class="multiple-versions-badge">${versions.length} Versões</div>` : ''}
                     ${posterUrl ? `<img src="${posterUrl}" alt="${title}" onerror="this.src='https://placehold.co/300x420/2c3e50/ffffff?text=Capa+N/D'; this.alt='Capa não disponível';">` : '<img src="https://placehold.co/300x420/2c3e50/ffffff?text=Capa+N/D" alt="Capa não disponível">'}
                 </div>
-                <div class="movie-info">
-                    <h3 class="movie-title">${title}</h3>
-                    <div class="movie-details">
-                        ${primaryVersion.Resolução ? `<span class="detail-tag">📺 ${primaryVersion.Resolução}</span>` : ''}
-                        ${primaryVersion.Formato ? `<span class="detail-tag">💿 ${primaryVersion.Formato}</span>` : ''}
-                        ${primaryVersion.Áudio ? `<span class="detail-tag">🔊 ${primaryVersion.Áudio}</span>` : ''}
-                        ${primaryVersion.Tamanho ? `<span class="detail-tag">📊 ${primaryVersion.Tamanho}</span>` : ''}
-                    </div>
-                    <div class="movie-synopsis">${primaryVersion.Sinopse || 'Sinopse não disponível'}</div>
-                    
-                    <div class="versions-section">
-                        ${createVersionsHTML(versions, hasMultipleVersions)}
-                    </div>
-                </div>
+                <h3 class="movie-title">${title}</h3>
             `;
 
-            // Adicionar event listeners para expansão das versões
-            if (hasMultipleVersions) {
-                const expandBtn = card.querySelector('.expand-btn');
-                const versionsContainer = card.querySelector('.versions-list');
-                
-                expandBtn.addEventListener('click', () => {
-                    const isExpanded = versionsContainer.classList.contains('versions-expanded');
-                    if (isExpanded) {
-                        versionsContainer.classList.remove('versions-expanded');
-                        versionsContainer.classList.add('versions-collapsed');
-                        expandBtn.textContent = `▼ Ver todas as ${versions.length} versões`;
-                    } else {
-                        versionsContainer.classList.remove('versions-collapsed');
-                        versionsContainer.classList.add('versions-expanded');
-                        expandBtn.textContent = '▲ Ocultar versões';
-                    }
-                });
-            }
+            // Adicionar event listener para abrir o modal ao clicar no card
+            card.addEventListener('click', () => openMovieModal(title));
 
             return card;
         }
 
-        // Criar HTML das versões de um filme
-        function createVersionsHTML(versions, hasMultipleVersions) {
-            let html = '';
-            
-            if (hasMultipleVersions) {
-                // Mostrar a primeira versão por padrão
-                html += createVersionItemHTML(versions[0], 0);
-                
-                // Versões adicionais (inicialmente ocultas)
-                html += `<div class="versions-list versions-collapsed">`;
-                for (let i = 1; i < versions.length; i++) {
-                    html += createVersionItemHTML(versions[i], i);
-                }
-                html += `</div>`;
-                
-                // Botão para expandir/ocultar
-                html += `<button class="expand-btn">▼ Ver todas as ${versions.length} versões</button>`;
-            } else {
-                // Apenas uma versão, exibe diretamente
-                html += createVersionItemHTML(versions[0], 0);
+        // Abrir o modal de detalhes do filme
+        function openMovieModal(title) {
+            const movieVersions = groupedMovies[title];
+            if (!movieVersions || movieVersions.length === 0) {
+                console.error('Dados do filme não encontrados para:', title);
+                return;
             }
-            
-            return html;
+
+            const primaryVersion = movieVersions[0];
+            const posterUrl = primaryVersion['Poster Página'];
+
+            modalTitle.textContent = title;
+            modalPosterImg.src = posterUrl || 'https://placehold.co/300x420/2c3e50/ffffff?text=Capa+N/D';
+            modalPosterImg.alt = `Poster de ${title}`;
+            modalSynopsis.textContent = primaryVersion.Sinopse || 'Sinopse não disponível.';
+
+            // Preencher detalhes (resolução, formato, áudio, tamanho)
+            modalDetails.innerHTML = `
+                ${primaryVersion.Resolução ? `<span class="detail-tag">📺 ${primaryVersion.Resolução}</span>` : ''}
+                ${primaryVersion.Formato ? `<span class="detail-tag">💿 ${primaryVersion.Formato}</span>` : ''}
+                ${primaryVersion.Áudio ? `<span class="detail-tag">🔊 ${primaryVersion.Áudio}</span>` : ''}
+                ${primaryVersion.Tamanho ? `<span class="detail-tag">📊 ${primaryVersion.Tamanho}</span>` : ''}
+            `;
+
+            // Preencher todas as versões
+            let versionsHtml = '';
+            movieVersions.forEach((version, index) => {
+                versionsHtml += createVersionItemHTML(version, index);
+            });
+            modalVersions.innerHTML = versionsHtml;
+
+            movieModal.style.display = 'flex'; // Exibe o modal
         }
 
-        // Criar item de versão individual
+        // Criar item de versão individual (para uso no modal)
         function createVersionItemHTML(version, index) {
             return `
                 <div class="version-item">
@@ -770,37 +850,6 @@
                     </div>
                 </div>
             `;
-        }
-
-        // Função principal para filtrar e exibir filmes (inclui paginação)
-        function filterAndDisplayMovies() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const resolutionValue = resolutionFilter.value;
-            const formatValue = formatFilter.value;
-            const audioValue = audioFilter.value;
-
-            // Filtra os títulos únicos de filmes com base nos critérios
-            filteredMovieTitles = Object.keys(groupedMovies).filter(title => {
-                const versions = groupedMovies[title];
-                
-                // Verifica se o título ou sinopse contém o termo de busca
-                const matchesSearch = title.toLowerCase().includes(searchTerm) ||
-                                     versions.some(v => v.Sinopse && v.Sinopse.toLowerCase().includes(searchTerm));
-                
-                // Verifica se pelo menos uma versão do filme atende aos filtros selecionados
-                const matchesFilters = versions.some(version => {
-                    const matchesResolution = !resolutionValue || version.Resolução === resolutionValue;
-                    const matchesFormat = !formatValue || version.Formato === formatValue;
-                    const matchesAudio = !audioValue || version.Áudio === audioValue;
-                    
-                    return matchesResolution && matchesFormat && matchesAudio;
-                });
-
-                return matchesSearch && matchesFilters;
-            });
-
-            currentPage = 1; // Reseta para a primeira página ao aplicar novos filtros ou busca
-            displayMovies(); // Exibe os filmes da página atual
         }
 
         // Atualizar estatísticas (total de filmes, filmes exibidos e info de paginação)
@@ -881,6 +930,25 @@
         resolutionFilter.addEventListener('change', filterAndDisplayMovies);
         formatFilter.addEventListener('change', filterAndDisplayMovies);
         audioFilter.addEventListener('change', filterAndDisplayMovies);
+
+        // Event listeners do Modal
+        closeButton.addEventListener('click', () => {
+            movieModal.style.display = 'none';
+        });
+
+        // Fechar o modal ao clicar fora do conteúdo
+        movieModal.addEventListener('click', (event) => {
+            if (event.target === movieModal) {
+                movieModal.style.display = 'none';
+            }
+        });
+
+        // Fechar o modal com a tecla ESC
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && movieModal.style.display === 'flex') {
+                movieModal.style.display = 'none';
+            }
+        });
 
         // Carregar dados quando a página carregar
         window.addEventListener('DOMContentLoaded', loadMovies);
