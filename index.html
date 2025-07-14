@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Starck Filmes - Biblioteca Digital</title>
-    <!-- Incluindo a fonte Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Incluindo WebTorrent.js para streaming no navegador (versão mais recente) -->
-    <script src="https://unpkg.com/webtorrent@0.108.6/webtorrent.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js"></script>
     <style>
-        /* Estilos gerais */
+        /* Estilos globais */
         * {
             margin: 0;
             padding: 0;
@@ -17,12 +15,13 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif; /* Usando Inter como solicitado */
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0c1022 0%, #1a1a2e 50%, #16213e 100%);
             color: #ffffff;
             min-height: 100vh;
         }
 
+        /* Estilos do cabeçalho */
         .header {
             background: rgba(0, 0, 0, 0.9);
             backdrop-filter: blur(10px);
@@ -63,6 +62,7 @@
             color: #a0a0a0;
         }
 
+        /* Estilos dos controles de busca e filtro */
         .controls {
             display: flex;
             gap: 1rem;
@@ -119,21 +119,22 @@
             color: #ffffff;
         }
 
-        /* Grid de filmes */
+        /* Estilos da grade de filmes */
         .movies-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Ajuste para telas menores */
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 2rem;
             margin: 2rem 0;
         }
 
-        @media (min-width: 1200px) { /* Para telas maiores, tenta 8 colunas */
+        /* Responsividade da grade */
+        @media (min-width: 1200px) {
             .movies-grid {
                 grid-template-columns: repeat(8, 1fr);
             }
         }
 
-        /* Card do filme */
+        /* Estilos do cartão de filme */
         .movie-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -144,9 +145,9 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            cursor: pointer; /* Indica que é clicável */
-            text-align: center; /* Centraliza o título */
-            padding-bottom: 1rem; /* Espaçamento abaixo do título */
+            cursor: pointer;
+            text-align: center;
+            padding-bottom: 1rem;
         }
 
         .movie-card:hover {
@@ -155,10 +156,9 @@
             border-color: rgba(78, 205, 196, 0.3);
         }
 
-        /* Poster do filme - Formato DVD */
         .movie-poster {
             width: 100%;
-            padding-bottom: 140%; /* Proporção 1:1.4 (largura para altura) para capa de DVD */
+            padding-bottom: 140%; /* Proporção 1:1.4 para pôsteres */
             position: relative;
             background: linear-gradient(45deg, #2c3e50, #3498db);
             display: flex;
@@ -167,7 +167,7 @@
             font-size: 4rem;
             color: rgba(255, 255, 255, 0.3);
             overflow: hidden;
-            margin-bottom: 0.5rem; /* Espaçamento entre poster e título */
+            margin-bottom: 0.5rem;
         }
 
         .movie-poster img {
@@ -202,22 +202,22 @@
             font-weight: bold;
             color: #ffffff;
             line-height: 1.3;
-            padding: 0 0.5rem; /* Adicionado padding para o título */
+            padding: 0 0.5rem;
         }
 
-        /* Modal de Detalhes do Filme */
+        /* Estilos do modal de filme */
         .movie-modal {
-            display: none; /* Oculto por padrão */
-            position: fixed; /* Fixo na tela */
-            z-index: 1000; /* Acima de tudo */
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto; /* Permite scroll se o conteúdo for grande */
-            background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro semi-transparente */
-            backdrop-filter: blur(5px); /* Efeito de blur no fundo */
-            display: flex;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex; /* Usado para centralizar */
             align-items: center;
             justify-content: center;
         }
@@ -234,7 +234,7 @@
             position: relative;
             animation: fadeIn 0.3s ease-out;
             max-height: 90vh; /* Limita a altura do modal */
-            overflow-y: auto; /* Adiciona scroll interno se necessário */
+            overflow-y: auto; /* Adiciona scroll se o conteúdo for muito grande */
         }
 
         @keyframes fadeIn {
@@ -261,14 +261,14 @@
 
         .modal-movie-details {
             display: flex;
-            flex-wrap: wrap; /* Permite quebrar em linha em telas menores */
+            flex-wrap: wrap;
             gap: 2rem;
             margin-top: 1rem;
         }
 
         .modal-poster {
-            flex: 0 0 250px; /* Largura fixa para o poster no modal */
-            height: 350px; /* Altura fixa para o poster no modal */
+            flex: 0 0 250px; /* Largura fixa para o pôster no modal */
+            height: 350px;
             position: relative;
             border-radius: 8px;
             overflow: hidden;
@@ -283,7 +283,7 @@
 
         .modal-info {
             flex: 1;
-            min-width: 300px; /* Garante que o info não fique muito pequeno */
+            min-width: 300px;
         }
 
         .modal-info h2 {
@@ -304,8 +304,8 @@
             color: #ccc;
             line-height: 1.6;
             margin-bottom: 1.5rem;
-            display: block; /* Garante que a sinopse seja totalmente visível no modal */
-            -webkit-line-clamp: unset; /* Remove o limite de linhas */
+            display: block;
+            -webkit-line-clamp: unset; /* Garante que a sinopse completa seja exibida no modal */
         }
 
         .modal-info .versions-section {
@@ -313,7 +313,6 @@
             padding-top: 1rem;
         }
 
-        /* Estilos para as versões dentro do modal (reutilizando existentes) */
         .version-item {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -392,24 +391,24 @@
             box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
         }
 
-        /* Estilos para o player de vídeo no modal */
+        /* Estilos do player de vídeo no modal */
         .modal-video-player {
             margin-top: 1.5rem;
             background-color: #000;
             border-radius: 8px;
             overflow: hidden;
-            display: none; /* Oculto por padrão */
+            display: none; /* Escondido por padrão */
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 200px; /* Altura mínima para o player */
-            position: relative; /* Para posicionar o spinner */
+            min-height: 200px;
+            position: relative;
         }
 
         .modal-video-player video {
             width: 100%;
             height: auto;
-            max-height: 60vh; /* Limita a altura do vídeo */
+            max-height: 60vh;
             background-color: #000;
             display: block;
         }
@@ -423,10 +422,9 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            min-height: 50px; /* Garante espaço para a mensagem */
+            min-height: 50px;
         }
 
-        /* Spinner de carregamento */
         .player-message.loading-spinner::after {
             content: '';
             display: inline-block;
@@ -439,7 +437,6 @@
             margin-left: 5px;
         }
 
-        /* Estilos para a seleção de arquivos de vídeo */
         .file-selection-area {
             padding: 1rem;
             width: 100%;
@@ -484,8 +481,7 @@
             box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
         }
 
-
-        /* Estados de carregamento e sem resultados */
+        /* Estilos de carregamento e sem resultados */
         .loading {
             text-align: center;
             padding: 4rem 0;
@@ -520,7 +516,7 @@
             font-size: 1.5rem;
         }
 
-        /* Paginação */
+        /* Estilos de paginação */
         .pagination {
             display: flex;
             justify-content: center;
@@ -563,7 +559,7 @@
             border-color: #4ecdc4;
         }
 
-        /* Media Queries para responsividade */
+        /* Media queries para responsividade */
         @media (max-width: 768px) {
             .container {
                 padding: 0 1rem;
@@ -584,11 +580,11 @@
             }
 
             .movies-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Ajuste para telas menores */
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             }
 
             .movie-poster {
-                padding-bottom: 140%; /* Mantém a proporção de DVD */
+                padding-bottom: 140%;
             }
 
             .modal-movie-details {
@@ -598,7 +594,7 @@
 
             .modal-poster {
                 width: 100%;
-                max-width: 200px; /* Limita a largura do poster em telas pequenas */
+                max-width: 200px;
                 height: auto;
             }
 
@@ -624,7 +620,7 @@
 
         @media (max-width: 480px) {
             .movies-grid {
-                grid-template-columns: 1fr; /* Uma coluna em telas muito pequenas */
+                grid-template-columns: 1fr;
             }
             .modal-content {
                 padding: 1rem;
@@ -682,11 +678,9 @@
         </div>
 
         <div id="pagination-controls" class="pagination" style="display: none;">
-            <!-- Controles de paginação serão inseridos aqui pelo JavaScript -->
         </div>
     </div>
 
-    <!-- Modal de Detalhes do Filme -->
     <div id="movie-modal" class="movie-modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
@@ -701,7 +695,6 @@
                     <div id="modal-versions" class="versions-section"></div>
                 </div>
             </div>
-            <!-- Nova seção para o player de vídeo e seleção de arquivos -->
             <div id="modal-video-player" class="modal-video-player">
                 <div class="player-message"></div>
                 <div id="file-selection-area" class="file-selection-area" style="display: none;">
@@ -716,7 +709,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
-        // Garante que o modal esteja oculto imediatamente ao carregar o script
+        // Garante que o modal esteja oculto ao carregar a página
         document.addEventListener('DOMContentLoaded', () => {
             const movieModal = document.getElementById('movie-modal');
             if (movieModal) {
@@ -724,13 +717,14 @@
             }
         });
 
-        let moviesData = []; // Todos os dados do CSV
-        let groupedMovies = {}; // Filmes agrupados por título principal
-        let filteredMovieTitles = []; // Títulos de filmes após filtros e busca
+        // Variáveis globais para armazenar dados e estado da aplicação
+        let moviesData = []; // Todos os dados de filmes do CSV
+        let groupedMovies = {}; // Filmes agrupados por título limpo
+        let filteredMovieTitles = []; // Títulos de filmes após aplicação de filtros
         let currentPage = 1; // Página atual da paginação
-        const moviesPerPage = 32; // Número de filmes por página (4 fileiras de 8)
+        const moviesPerPage = 32; // Número de filmes por página
 
-        // Elementos do DOM
+        // Referências aos elementos do DOM
         const searchInput = document.getElementById('search-input');
         const resolutionFilter = document.getElementById('resolution-filter');
         const formatFilter = document.getElementById('format-filter');
@@ -743,7 +737,6 @@
         const paginationInfoSpan = document.getElementById('pagination-info');
         const paginationControls = document.getElementById('pagination-controls');
 
-        // Elementos do Modal
         const movieModal = document.getElementById('movie-modal');
         const closeButton = document.querySelector('.close-button');
         const modalTitle = document.getElementById('modal-title');
@@ -759,20 +752,27 @@
         const webtorrentVideoElement = document.getElementById('webtorrent-video');
 
         let webtorrentClient = null; // Instância do cliente WebTorrent
-        let currentTorrent = null; // Armazena o torrent atualmente carregado
-        let torrentTimeout = null; // Para o timeout de carregamento do torrent
+        let currentTorrent = null; // O torrent atualmente ativo
+        let torrentTimeout = null; // Timeout para conexão do torrent
 
-        // Função para limpar o título e extrair nome principal (removendo "Torrent" e similares)
+        /**
+         * Limpa o título do filme removendo sufixos de torrent e informações entre parênteses.
+         * @param {string} title O título original do filme.
+         * @returns {string} O título limpo.
+         */
         function cleanTitle(title) {
             return title.replace(/\s+Torrent.*$/, '')
-                        .replace(/\s+\(.*\)$/, '') // Remove "(Ano)" ou "(Qualquer coisa)" no final
+                        .replace(/\s+\(.*\)$/, '')
                         .trim();
         }
 
-        // Carregar dados dos CSVs
+        /**
+         * Carrega os dados dos filmes a partir de arquivos CSV.
+         * Combina os dados de duas partes e os agrupa por título.
+         */
         async function loadMovies() {
             try {
-                // Fetch both CSV files concurrently
+                // Faz o fetch de ambos os arquivos CSV em paralelo
                 const [response1, response2] = await Promise.all([
                     fetch('starckfilmes_parte1.csv'),
                     fetch('starckfilmes_parte2.csv')
@@ -781,7 +781,7 @@
                 const csvText1 = await response1.text();
                 const csvText2 = await response2.text();
 
-                // Parse both CSVs
+                // Cria Promises para o parsing de cada CSV
                 const parsePromise1 = new Promise((resolve, reject) => {
                     Papa.parse(csvText1, {
                         header: true,
@@ -810,12 +810,23 @@
                     });
                 });
 
+                // Aguarda o parsing de ambos os arquivos
                 const [data1, data2] = await Promise.all([parsePromise1, parsePromise2]);
                 
-                // Combine data from both CSVs
                 moviesData = [...data1, ...data2];
                 
-                // Agrupar filmes por título principal
+                // Verifica se algum dado foi carregado e parseado
+                if (moviesData.length === 0) {
+                    loadingDiv.style.display = 'none';
+                    noResultsDiv.style.display = 'block';
+                    noResultsDiv.innerHTML = '<h3>⚠️ Nenhum dado de filme encontrado.</h3><p>Verifique se os arquivos CSV não estão vazios ou mal formatados.</p>';
+                    moviesContainer.style.display = 'none';
+                    paginationControls.style.display = 'none';
+                    updateStats();
+                    return; // Sai da função se não houver dados
+                }
+
+                // Agrupa os filmes por título limpo
                 groupedMovies = {};
                 moviesData.forEach(movie => {
                     const cleanedTitle = cleanTitle(movie.Título);
@@ -825,7 +836,7 @@
                     groupedMovies[cleanedTitle].push(movie);
                 });
 
-                // Ordenar versões dentro de cada grupo (ex: 4K, 1080p, 720p)
+                // Opcional: Ordena as versões de cada filme por resolução (maior para menor)
                 Object.keys(groupedMovies).forEach(title => {
                     groupedMovies[title].sort((a, b) => {
                         const resolutionOrder = { '4K': 4, '2160p': 4, '1080p': 3, '720p': 2, '480p': 1 };
@@ -833,27 +844,33 @@
                     });
                 });
 
-                // Inicializa os títulos filtrados com todos os filmes únicos
+                // Define os títulos de filmes filtrados inicialmente como todos os títulos únicos
                 filteredMovieTitles = Object.keys(groupedMovies);
                 
-                console.log('--- Dados Carregados ---');
-                console.log('moviesData length:', moviesData.length);
-                console.log('Número de títulos de filmes únicos (groupedMovies):', Object.keys(groupedMovies).length);
-                console.log('filteredMovieTitles inicial length:', filteredMovieTitles.length);
+                console.log('Dados Carregados:', moviesData.length, 'filmes');
+                console.log('Títulos únicos:', Object.keys(groupedMovies).length);
 
-                populateFilters(); // Preenche os filtros de resolução, formato e áudio
-                filterAndDisplayMovies(); // Aplica filtros e exibe a primeira página
+                // Popula os filtros e exibe os filmes
+                populateFilters();
+                filterAndDisplayMovies();
                 
+                // Oculta o carregamento e mostra o conteúdo
                 loadingDiv.style.display = 'none';
                 moviesContainer.style.display = 'grid';
-                paginationControls.style.display = 'flex'; // Mostra os controles de paginação
+                paginationControls.style.display = 'flex';
             } catch (error) {
                 console.error('Erro ao carregar CSVs:', error);
                 loadingDiv.innerHTML = '❌ Erro ao carregar os dados. Verifique se os arquivos CSV estão no diretório.';
+                loadingDiv.style.display = 'block'; // Garante que a mensagem de erro de carregamento seja visível
+                moviesContainer.style.display = 'none';
+                paginationControls.style.display = 'none';
+                noResultsDiv.style.display = 'none'; // Esconde a mensagem de "nenhum resultado" se for um erro de carregamento
             }
         }
 
-        // Preencher os selects de filtro com opções únicas
+        /**
+         * Popula os dropdowns de filtro com opções únicas de resolução, formato e áudio.
+         */
         function populateFilters() {
             const resolutions = [...new Set(moviesData.map(movie => movie.Resolução).filter(r => r))];
             const formats = [...new Set(moviesData.map(movie => movie.Formato).filter(f => f))];
@@ -864,8 +881,13 @@
             populateSelect(audioFilter, audios);
         }
 
+        /**
+         * Preenche um elemento <select> com as opções fornecidas.
+         * @param {HTMLSelectElement} select O elemento select a ser preenchido.
+         * @param {string[]} options As opções a serem adicionadas.
+         */
         function populateSelect(select, options) {
-            // Limpa opções existentes, exceto a primeira (Todas as...)
+            // Remove todas as opções exceto a primeira (que é "Todas as...")
             while (select.options.length > 1) {
                 select.remove(1);
             }
@@ -877,18 +899,17 @@
             });
         }
 
-        // Exibir filmes na página atual
+        /**
+         * Exibe os filmes na grade, aplicando a paginação.
+         */
         function displayMovies() {
-            moviesContainer.innerHTML = ''; // Limpa o container de filmes
+            moviesContainer.innerHTML = ''; // Limpa o container antes de adicionar novos filmes
             
-            console.log('--- Exibindo Filmes ---');
-            console.log('filteredMovieTitles length ao exibir:', filteredMovieTitles.length);
-
             if (filteredMovieTitles.length === 0) {
                 noResultsDiv.style.display = 'block';
                 moviesContainer.style.display = 'none';
                 paginationControls.style.display = 'none';
-                updateStats(); // Atualiza as estatísticas para 0 filmes
+                updateStats();
                 return;
             }
 
@@ -901,29 +922,31 @@
             const endIndex = startIndex + moviesPerPage;
             const moviesToDisplay = filteredMovieTitles.slice(startIndex, endIndex);
 
-            console.log('moviesToDisplay length:', moviesToDisplay.length);
-            console.log('moviesToDisplay (primeiros 5):', moviesToDisplay.slice(0, 5));
-
             moviesToDisplay.forEach(title => {
                 const movieVersions = groupedMovies[title];
                 const movieCard = createMovieCard(title, movieVersions);
                 moviesContainer.appendChild(movieCard);
             });
 
-            updateStats(); // Atualiza as estatísticas
+            updateStats(); // Atualiza as estatísticas exibidas no cabeçalho
             renderPagination(); // Renderiza os controles de paginação
         }
 
-        // Criar card do filme (apenas capa e título)
+        /**
+         * Cria um elemento de cartão de filme para exibição na grade.
+         * @param {string} title O título limpo do filme.
+         * @param {Object[]} versions As versões disponíveis do filme.
+         * @returns {HTMLDivElement} O elemento do cartão de filme.
+         */
         function createMovieCard(title, versions) {
-            const primaryVersion = versions[0];
+            const primaryVersion = versions[0]; // Usa a primeira versão para o pôster e detalhes principais
             const hasMultipleVersions = versions.length > 1;
             
             const card = document.createElement('div');
             card.className = 'movie-card';
-            card.dataset.title = title; // Armazena o título para fácil acesso ao clicar
+            card.dataset.title = title; // Armazena o título para fácil referência
 
-            const posterUrl = primaryVersion['Poster Página'];
+            const posterUrl = primaryVersion['Poster Página']; // Assumindo que esta coluna contém a URL do pôster
 
             card.innerHTML = `
                 <div class="movie-poster">
@@ -933,13 +956,16 @@
                 <h3 class="movie-title">${title}</h3>
             `;
 
-            // Adicionar event listener para abrir o modal ao clicar no card
+            // Adiciona o evento de clique para abrir o modal
             card.addEventListener('click', () => openMovieModal(title));
 
             return card;
         }
 
-        // Abrir o modal de detalhes do filme
+        /**
+         * Abre o modal de detalhes do filme com as informações da versão selecionada.
+         * @param {string} title O título do filme a ser exibido no modal.
+         */
         function openMovieModal(title) {
             const movieVersions = groupedMovies[title];
             if (!movieVersions || movieVersions.length === 0) {
@@ -947,7 +973,7 @@
                 return;
             }
 
-            const primaryVersion = movieVersions[0];
+            const primaryVersion = movieVersions[0]; // Usa a primeira versão para os detalhes principais do modal
             const posterUrl = primaryVersion['Poster Página'];
 
             modalTitle.textContent = title;
@@ -955,7 +981,7 @@
             modalPosterImg.alt = `Poster de ${title}`;
             modalSynopsis.textContent = primaryVersion.Sinopse || 'Sinopse não disponível.';
 
-            // Preencher detalhes (resolução, formato, áudio, tamanho)
+            // Preenche os detalhes (resolução, formato, áudio, tamanho)
             modalDetails.innerHTML = `
                 ${primaryVersion.Resolução ? `<span class="detail-tag">📺 ${primaryVersion.Resolução}</span>` : ''}
                 ${primaryVersion.Formato ? `<span class="detail-tag">💿 ${primaryVersion.Formato}</span>` : ''}
@@ -963,60 +989,66 @@
                 ${primaryVersion.Tamanho ? `<span class="detail-tag">📊 ${primaryVersion.Tamanho}</span>` : ''}
             `;
 
-            // Preencher todas as versões
+            // Renderiza as diferentes versões do filme
             let versionsHtml = '';
             movieVersions.forEach((version, index) => {
                 versionsHtml += createVersionItemHTML(version, index);
             });
             modalVersions.innerHTML = versionsHtml;
 
-            // Resetar o estado do player ao abrir um novo modal
-            resetMediaPlayer();
+            resetMediaPlayer(); // Reseta o player de vídeo ao abrir um novo modal
 
             movieModal.style.display = 'flex'; // Exibe o modal
         }
 
-        // Função para resetar o estado do player de vídeo e seleção de arquivos
+        /**
+         * Reseta o estado do player de vídeo e do cliente WebTorrent.
+         * Isso é importante para liberar recursos e preparar para um novo streaming.
+         */
         function resetMediaPlayer() {
-            modalVideoPlayer.style.display = 'none'; // Esconde o container do player
-            playerMessage.textContent = ''; // Limpa mensagens
-            playerMessage.classList.remove('loading-spinner'); // Remove spinner
-            fileSelectionArea.style.display = 'none'; // Esconde a área de seleção de arquivos
-            fileListDiv.innerHTML = ''; // Limpa a lista de arquivos
-            playSelectedFileBtn.style.display = 'none'; // Esconde o botão de play
+            modalVideoPlayer.style.display = 'none';
+            playerMessage.textContent = '';
+            playerMessage.classList.remove('loading-spinner');
+            fileSelectionArea.style.display = 'none';
+            fileListDiv.innerHTML = '';
+            playSelectedFileBtn.style.display = 'none';
             
-            // Stop and unload the video
             webtorrentVideoElement.pause();
-            webtorrentVideoElement.src = ''; // Clear the source
-            webtorrentVideoElement.load(); // Reload the video element to clear it
-            webtorrentVideoElement.style.display = 'none'; // Hide the video element
-            webtorrentVideoElement.muted = true; // Ensure it's muted for next autoplay attempt
+            webtorrentVideoElement.src = ''; // Limpa a fonte do vídeo
+            webtorrentVideoElement.load(); // Recarrega o elemento de vídeo
+            webtorrentVideoElement.style.display = 'none';
+            webtorrentVideoElement.muted = true; // Garante que o vídeo comece mudo
 
-            // Clear any pending torrent timeout
+            // Limpa o timeout de conexão, se houver
             if (torrentTimeout) {
                 clearTimeout(torrentTimeout);
                 torrentTimeout = null;
             }
 
-            // Destruir o cliente WebTorrent se estiver ativo
+            // Destrói o cliente WebTorrent se ele existir
             if (webtorrentClient) {
                 webtorrentClient.destroy(() => {
                     console.log('WebTorrent client destroyed.');
                     webtorrentClient = null;
-                    currentTorrent = null; // Limpa o torrent atual
+                    currentTorrent = null;
                 });
             } else {
+                // Se não houver cliente, apenas reseta as variáveis
                 webtorrentClient = null;
                 currentTorrent = null;
             }
-            // Garante que a seção de detalhes do filme esteja visível
+            // Garante que os detalhes do filme sejam visíveis novamente
             document.querySelector('.modal-movie-details').style.display = 'flex';
         }
 
-
-        // Criar item de versão individual (para uso no modal)
+        /**
+         * Cria o HTML para um item de versão de filme no modal.
+         * @param {Object} version Os dados da versão do filme.
+         * @param {number} index O índice da versão.
+         * @returns {string} O HTML do item de versão.
+         */
         function createVersionItemHTML(version, index) {
-            // Adicionado o botão "Assistir"
+            // Botão de assistir só é renderizado se houver um link magnet
             const watchButton = version.Magnet ? `<button class="download-btn secondary watch-btn" data-magnet="${version.Magnet}">▶️ Assistir</button>` : '';
 
             return `
@@ -1039,168 +1071,135 @@
             `;
         }
 
-        // Função para iniciar o streaming do torrent
+        /**
+         * Inicia o streaming de um torrent usando WebTorrent.
+         * @param {string} magnetURI O link magnet do torrent.
+         */
         function watchTorrent(magnetURI) {
-            // Esconder a seção de detalhes do filme e mostrar o player
+            if (!magnetURI || !magnetURI.startsWith('magnet:')) {
+                playerMessage.textContent = 'Link Magnet inválido. Não é possível iniciar o streaming.';
+                return;
+            }
+
+            // Oculta os detalhes do filme e mostra o player
             document.querySelector('.modal-movie-details').style.display = 'none';
             modalVideoPlayer.style.display = 'flex';
             playerMessage.textContent = 'Iniciando streaming... Aguarde.';
-            playerMessage.classList.add('loading-spinner'); // Adiciona spinner
-            webtorrentVideoElement.style.display = 'none'; // Esconde o vídeo enquanto carrega
+            playerMessage.classList.add('loading-spinner');
+            webtorrentVideoElement.style.display = 'none';
 
-            // Destruir cliente existente se houver
+            // Destrói o cliente existente antes de criar um novo
             if (webtorrentClient) {
-                webtorrentClient.destroy(() => {
-                    console.log('WebTorrent client destroyed before new stream.');
-                    webtorrentClient = null;
-                    startNewWebTorrentClient(magnetURI);
-                });
-            } else {
-                startNewWebTorrentClient(magnetURI);
+                webtorrentClient.destroy();
             }
-        }
 
-        function startNewWebTorrentClient(magnetURI) {
-            try {
-                webtorrentClient = new WebTorrent();
-
-                // Set a timeout for torrent metadata fetching
-                torrentTimeout = setTimeout(() => {
-                    if (!currentTorrent || !currentTorrent.ready) {
-                        playerMessage.textContent = 'Tempo limite excedido (30s). Não foi possível encontrar pares ou metadados para este torrent. O magnet link pode estar inativo ou sua conexão está bloqueando P2P.';
-                        playerMessage.classList.remove('loading-spinner');
-                        webtorrentVideoElement.style.display = 'none';
-                        fileSelectionArea.style.display = 'none';
-                        playSelectedFileBtn.style.display = 'none';
-                        document.querySelector('.modal-movie-details').style.display = 'flex';
-                        modalVideoPlayer.style.display = 'none';
-                        resetMediaPlayer(); // Clean up
-                    }
-                }, 30000); // 30 seconds timeout
-
-                webtorrentClient.add(magnetURI, (torrent) => {
-                    currentTorrent = torrent; // Armazena o torrent carregado
-                    playerMessage.textContent = `Torrent adicionado: ${torrent.name}. Buscando metadados e pares...`;
-                    playerMessage.classList.add('loading-spinner');
-                    console.log('Torrent adicionado:', torrent.name);
-
-                    torrent.on('ready', () => {
-                        // Clear the timeout if torrent becomes ready
-                        if (torrentTimeout) {
-                            clearTimeout(torrentTimeout);
-                            torrentTimeout = null;
-                        }
-
-                        playerMessage.textContent = `Metadados carregados. Encontrando arquivos de vídeo. Pares: ${torrent.numPeers}`;
-                        playerMessage.classList.add('loading-spinner');
-                        console.log('Torrent is ready:', torrent.name);
-
-                        const videoFiles = torrent.files.filter(file => {
-                            const lowerCaseName = file.name.toLowerCase();
-                            // Expanded list of common video extensions
-                            return lowerCaseName.endsWith('.mp4') || lowerCaseName.endsWith('.webm') ||
-                                   lowerCaseName.endsWith('.ogg') || lowerCaseName.endsWith('.mkv') ||
-                                   lowerCaseName.endsWith('.avi') || lowerCaseName.endsWith('.mov') ||
-                                   lowerCaseName.endsWith('.flv') || lowerCaseName.endsWith('.wmv');
-                        });
-
-                        if (videoFiles.length > 1) {
-                            // Se houver múltiplos arquivos de vídeo, exibe a seleção
-                            renderFileSelectionUI(videoFiles);
-                        } else if (videoFiles.length === 1) {
-                            // Se houver apenas um arquivo de vídeo, inicia a reprodução automaticamente
-                            playSelectedFile(videoFiles[0]);
-                        } else {
-                            // Se não houver arquivos de vídeo compatíveis
-                            playerMessage.textContent = 'Nenhum arquivo de vídeo compatível (.mp4, .webm, .mkv, etc.) encontrado neste torrent.';
-                            playerMessage.classList.remove('loading-spinner');
-                            webtorrentVideoElement.style.display = 'none';
-                            fileSelectionArea.style.display = 'none';
-                            playSelectedFileBtn.style.display = 'none';
-                        }
-                    });
-
-                    torrent.on('error', (err) => {
-                        console.error('Torrent Error:', err);
-                        playerMessage.textContent = `Erro no torrent: ${err.message || 'Ocorreu um erro no torrent.'}`;
-                        playerMessage.classList.remove('loading-spinner');
-                        webtorrentVideoElement.style.display = 'none';
-                        fileSelectionArea.style.display = 'none';
-                        playSelectedFileBtn.style.display = 'none';
-                        // Reverter para a visualização de detalhes se ocorrer um erro grave no cliente
-                        document.querySelector('.modal-movie-details').style.display = 'flex';
-                        modalVideoPlayer.style.display = 'none';
-                        resetMediaPlayer(); // Limpa o player em caso de erro
-                    });
-
-                    torrent.on('warning', (warning) => {
-                        console.warn('Torrent Warning:', warning);
-                        // Can display warnings to user if needed
-                    });
-
-                    torrent.on('download', () => {
-                        const progress = (torrent.progress * 100).toFixed(1);
-                        const downloaded = (torrent.downloaded / (1024 * 1024)).toFixed(2); // MB
-                        const total = (torrent.length / (1024 * 1024)).toFixed(2); // MB
-                        const downloadSpeed = (torrent.downloadSpeed / (1024 * 1024)).toFixed(2); // MB/s
-                        // Update progress message only if video is not playing or is an initial message
-                        if (webtorrentVideoElement.paused || webtorrentVideoElement.ended || playerMessage.textContent.includes('Baixando:') || playerMessage.textContent.includes('Preparando vídeo...')) {
-                            playerMessage.textContent = `Baixando: ${progress}% (${downloaded}/${total} MB) - Velocidade: ${downloadSpeed} MB/s - Pares: ${torrent.numPeers}`;
-                            playerMessage.classList.add('loading-spinner');
-                        }
-                    });
-
-                    torrent.on('upload', () => {
-                        // Optional: display upload speed
-                        // console.log('Upload speed:', (torrent.uploadSpeed / 1000000).toFixed(2), 'MB/s');
-                    });
-
-                    torrent.on('wire', (wire) => {
-                        console.log('New peer connected:', wire.remoteAddress);
-                        // Optional: update peer count in playerMessage
-                        if (playerMessage.textContent.includes('Pares:')) {
-                            playerMessage.textContent = playerMessage.textContent.replace(/Pares: \d+/, `Pares: ${torrent.numPeers}`);
-                        }
-                    });
-
-                    torrent.on('done', () => {
-                        console.log('Torrent download finished!');
-                        if (playerMessage.textContent.includes('Baixando:')) {
-                            playerMessage.textContent = 'Download completo!';
-                            playerMessage.classList.remove('loading-spinner');
-                        }
-                    });
-
-                });
-
-                webtorrentClient.on('error', (err) => {
-                    console.error('WebTorrent Client Error:', err);
-                    playerMessage.textContent = `Erro no cliente WebTorrent: ${err.message || 'Verifique sua conexão ou o magnet link.'}`;
+            // Define um timeout para caso a conexão demore muito
+            const connectionTimeout = setTimeout(() => {
+                if (!currentTorrent || !currentTorrent.ready) {
+                    playerMessage.textContent = 'Timeout: Não foi possível conectar. Verifique sua conexão ou tente outro arquivo.';
                     playerMessage.classList.remove('loading-spinner');
-                    // Reverter para a visualização de detalhes se ocorrer um erro grave no cliente
-                    document.querySelector('.modal-movie-details').style.display = 'flex';
-                    modalVideoPlayer.style.display = 'none';
-                    resetMediaPlayer(); // Limpa o player em caso de erro
+                    resetMediaPlayer();
+                }
+            }, 15000); // 15 segundos de timeout
+
+            // Inicializa o cliente WebTorrent com STUN servers para melhor conectividade P2P
+            webtorrentClient = new WebTorrent({
+                tracker: {
+                    rtcConfig: {
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            { urls: 'stun:stun1.l.google.com:19302' },
+                            { urls: 'stun:stun2.l.google.com:19302' }
+                        ]
+                    }
+                }
+            });
+
+            // Adiciona o torrent ao cliente WebTorrent
+            webtorrentClient.add(magnetURI, torrent => {
+                clearTimeout(connectionTimeout); // Limpa o timeout assim que o torrent é adicionado
+                currentTorrent = torrent;
+                playerMessage.textContent = 'Torrent adicionado. Buscando metadados e pares...';
+                playerMessage.classList.add('loading-spinner');
+                console.log('Torrent adicionado:', torrent.name);
+
+                // Evento 'ready': quando os metadados do torrent são carregados
+                torrent.on('ready', () => {
+                    playerMessage.textContent = 'Metadados carregados. Encontrando arquivos de vídeo...';
+                    playerMessage.classList.add('loading-spinner');
+                    console.log('Torrent is ready:', torrent.name);
+
+                    // Filtra os arquivos de vídeo compatíveis
+                    const videoFiles = torrent.files.filter(file => {
+                        const lowerCaseName = file.name.toLowerCase();
+                        return lowerCaseName.endsWith('.mp4') || lowerCaseName.endsWith('.webm') ||
+                               lowerCaseName.endsWith('.ogg') || lowerCaseName.endsWith('.mkv') ||
+                               lowerCaseName.endsWith('.avi') || lowerCaseName.endsWith('.mov') ||
+                               lowerCaseName.endsWith('.flv') || lowerCaseName.endsWith('.wmv');
+                    });
+
+                    if (videoFiles.length > 1) {
+                        renderFileSelectionUI(videoFiles); // Se houver múltiplos, permite seleção
+                    } else if (videoFiles.length === 1) {
+                        playSelectedFile(videoFiles[0]); // Se houver um, reproduz diretamente
+                    } else {
+                        // Nenhum arquivo de vídeo encontrado
+                        playerMessage.textContent = 'Nenhum arquivo de vídeo compatível encontrado neste torrent.';
+                        playerMessage.classList.remove('loading-spinner');
+                        webtorrentVideoElement.style.display = 'none';
+                        fileSelectionArea.style.display = 'none';
+                        playSelectedFileBtn.style.display = 'none';
+                    }
                 });
 
-            } catch (e) {
-                console.error('Erro ao inicializar WebTorrent:', e);
-                playerMessage.textContent = 'Não foi possível iniciar o player de torrent. Seu navegador pode não ser compatível.';
-                playerMessage.classList.remove('loading-spinner');
-                document.querySelector('.modal-movie-details').style.display = 'flex';
-                modalVideoPlayer.style.display = 'none';
-                resetMediaPlayer(); // Limpa o player em caso de erro
-            }
+                // Evento 'error': para erros relacionados ao torrent
+                torrent.on('error', (err) => {
+                    console.error('Torrent Error:', err);
+                    playerMessage.textContent = `Erro no torrent: ${err.message || 'Ocorreu um erro no torrent.'}`;
+                    playerMessage.classList.remove('loading-spinner');
+                    resetMediaPlayer();
+                });
+
+                // Evento 'warning': para avisos do torrent
+                torrent.on('warning', (warning) => {
+                    console.warn('Torrent Warning:', warning);
+                });
+
+                // Evento 'download': para atualizar o progresso do download
+                torrent.on('download', () => {
+                    const progress = (torrent.progress * 100).toFixed(1);
+                    const downloaded = (torrent.downloaded / (1024 * 1024)).toFixed(2);
+                    const total = (torrent.length / (1024 * 1024)).toFixed(2);
+                    const downloadSpeed = (torrent.downloadSpeed / (1024 * 1024)).toFixed(2);
+                    // Atualiza a mensagem apenas se o vídeo não estiver sendo reproduzido ativamente
+                    if (webtorrentVideoElement.paused || webtorrentVideoElement.ended || playerMessage.textContent.includes('Baixando:') || playerMessage.textContent.includes('Preparando vídeo...')) {
+                        playerMessage.textContent = `Baixando: ${progress}% (${downloaded}/${total} MB) - Velocidade: ${downloadSpeed} MB/s - Pares: ${torrent.numPeers}`;
+                        playerMessage.classList.add('loading-spinner');
+                    }
+                });
+
+                // Evento 'done': quando o download do torrent é concluído
+                torrent.on('done', () => {
+                    console.log('Torrent download finished!');
+                    if (playerMessage.textContent.includes('Baixando:')) {
+                        playerMessage.textContent = 'Download completo!';
+                        playerMessage.classList.remove('loading-spinner');
+                    }
+                });
+            }); 
         }
 
-        // Função para exibir a interface de seleção de arquivos
+        /**
+         * Renderiza a interface de seleção de arquivo quando há múltiplos arquivos de vídeo no torrent.
+         * @param {WebTorrent.File[]} files Os arquivos de vídeo disponíveis.
+         */
         function renderFileSelectionUI(files) {
             fileSelectionArea.style.display = 'block';
             fileListDiv.innerHTML = '';
             playSelectedFileBtn.style.display = 'block';
             playerMessage.textContent = 'Selecione um arquivo de vídeo para assistir:';
-            playerMessage.classList.remove('loading-spinner'); // Remove spinner para seleção
-            webtorrentVideoElement.style.display = 'none'; // Garante que o vídeo esteja oculto
+            playerMessage.classList.remove('loading-spinner');
+            webtorrentVideoElement.style.display = 'none';
 
             files.forEach((file, index) => {
                 const label = document.createElement('label');
@@ -1218,22 +1217,26 @@
             };
         }
 
-        // Função para reproduzir o arquivo selecionado
+        /**
+         * Reproduz o arquivo de vídeo selecionado usando o elemento <video>.
+         * @param {WebTorrent.File} file O arquivo WebTorrent a ser reproduzido.
+         */
         function playSelectedFile(file) {
-            fileSelectionArea.style.display = 'none'; // Esconde a seleção de arquivos
-            playSelectedFileBtn.style.display = 'none'; // Esconde o botão de play
-            playerMessage.textContent = 'Preparando vídeo... (bufferizando)'; // More specific message
-            playerMessage.classList.add('loading-spinner'); // Adiciona spinner
-            webtorrentVideoElement.style.display = 'block'; // Mostra o elemento de vídeo
+            fileSelectionArea.style.display = 'none';
+            playSelectedFileBtn.style.display = 'none';
+            playerMessage.textContent = 'Preparando vídeo... (bufferizando)';
+            playerMessage.classList.add('loading-spinner');
+            webtorrentVideoElement.style.display = 'block';
 
-            // Ensure webtorrentVideoElement is cleared before rendering a new file
+            // Limpa a fonte e recarrega para garantir que o vídeo anterior não interfira
             webtorrentVideoElement.src = '';
             webtorrentVideoElement.load();
 
+            // Renderiza o arquivo WebTorrent diretamente no elemento de vídeo
             file.renderTo(webtorrentVideoElement, {
                 autoplay: true,
                 controls: true,
-                muted: true // Start muted to comply with autoplay policies
+                muted: true // Começa mudo para evitar problemas de autoplay em navegadores
             }, (err, videoElement) => {
                 if (err) {
                     console.error('Erro ao renderizar vídeo:', err);
@@ -1242,38 +1245,40 @@
                     webtorrentVideoElement.style.display = 'none';
                     return;
                 }
-                playerMessage.textContent = ''; // Clear loading message once rendering starts
-                playerMessage.classList.remove('loading-spinner'); // Remove spinner once video is ready to play
+                playerMessage.textContent = ''; // Limpa a mensagem de carregamento
+                playerMessage.classList.remove('loading-spinner');
 
-                // Try to unmute after a short delay or user interaction
+                // Evento para quando o vídeo está pronto para ser reproduzido
                 videoElement.addEventListener('canplay', () => {
                     if (videoElement.muted) {
                         playerMessage.textContent = 'Clique no vídeo para iniciar a reprodução com áudio.';
+                        // Tenta tocar automaticamente (pode ser bloqueado pelo navegador se não for mudo)
                         videoElement.play().catch(e => {
                             console.warn('Autoplay with sound prevented:', e);
-                            // Message already set above
                         });
                     }
-                }, { once: true }); // Only run once
+                }, { once: true }); // Executa apenas uma vez
 
+                // Eventos de estado do vídeo
                 videoElement.addEventListener('playing', () => {
-                    playerMessage.textContent = 'Reproduzindo!'; // Confirm playback
+                    playerMessage.textContent = 'Reproduzindo!';
                     playerMessage.classList.remove('loading-spinner');
                 });
 
                 videoElement.addEventListener('waiting', () => {
-                    playerMessage.textContent = 'Bufferizando...'; // Show buffering status
+                    playerMessage.textContent = 'Bufferizando...';
                     playerMessage.classList.add('loading-spinner');
                 });
 
                 videoElement.addEventListener('stalled', () => {
-                    playerMessage.textContent = 'Conexão instável... Tentando reconectar.'; // Show stalled status
+                    playerMessage.textContent = 'Conexão instável... Tentando reconectar.';
                     playerMessage.classList.add('loading-spinner');
                 });
 
+                // Manipulação de erros do elemento de vídeo
                 videoElement.addEventListener('error', (e) => {
-                    console.error('Erro no elemento de vídeo durante reprodução:', e);
-                    let errorMessage = 'Erro de reprodução. O arquivo pode estar corrompido ou o formato não é suportado pelo seu navegador.';
+                    console.error('Erro no elemento de vídeo:', e);
+                    let errorMessage = 'Erro de reprodução. O arquivo pode estar corrompido ou o formato não é suportado.';
                     if (e.target && e.target.error) {
                         switch (e.target.error.code) {
                             case e.target.error.MEDIA_ERR_ABORTED:
@@ -1299,23 +1304,24 @@
             });
         }
 
-
-        // Função principal para filtrar e exibir filmes (inclui paginação)
+        /**
+         * Filtra os filmes com base nos termos de busca e nos filtros selecionados,
+         * e então chama a função para exibi-los.
+         */
         function filterAndDisplayMovies() {
             const searchTerm = searchInput.value.toLowerCase();
             const resolutionValue = resolutionFilter.value;
             const formatValue = formatFilter.value;
             const audioValue = audioFilter.value;
 
-            // Filtra os títulos únicos de filmes com base nos critérios
             filteredMovieTitles = Object.keys(groupedMovies).filter(title => {
                 const versions = groupedMovies[title];
                 
-                // Verifica se o título ou sinopse contém o termo de busca
+                // Verifica se o título ou a sinopse de alguma versão corresponde ao termo de busca
                 const matchesSearch = title.toLowerCase().includes(searchTerm) ||
-                                            versions.some(v => v.Sinopse && v.Sinopse.toLowerCase().includes(searchTerm));
+                                     versions.some(v => v.Sinopse && v.Sinopse.toLowerCase().includes(searchTerm));
                 
-                // Verifica se pelo menos uma versão do filme atende aos filtros selecionados
+                // Verifica se alguma versão corresponde aos filtros selecionados
                 const matchesFilters = versions.some(version => {
                     const matchesResolution = !resolutionValue || version.Resolução === resolutionValue;
                     const matchesFormat = !formatValue || version.Formato === formatValue;
@@ -1327,19 +1333,13 @@
                 return matchesSearch && matchesFilters;
             });
 
-            console.log('--- Filtros Aplicados ---');
-            console.log('Termo de busca:', searchTerm);
-            console.log('Resolução selecionada:', resolutionValue);
-            console.log('Formato selecionado:', formatValue);
-            console.log('Áudio selecionado:', audioValue);
-            console.log('filteredMovieTitles length após filtrar:', filteredMovieTitles.length);
-            console.log('filteredMovieTitles (primeiros 5):', filteredMovieTitles.slice(0, 5));
-
-            currentPage = 1; // Reseta para a primeira página ao aplicar novos filtros ou busca
-            displayMovies(); // Exibe os filmes da página atual
+            currentPage = 1; // Reseta para a primeira página após a filtragem
+            displayMovies();
         }
 
-        // Atualizar estatísticas (total de filmes, filmes exibidos e info de paginação)
+        /**
+         * Atualiza as estatísticas exibidas no cabeçalho (total de filmes, filmes exibidos, info de paginação).
+         */
         function updateStats() {
             const totalVersions = moviesData.length;
             const totalUniqueMovies = Object.keys(groupedMovies).length;
@@ -1350,17 +1350,19 @@
             paginationInfoSpan.textContent = `Página: ${filteredMovieTitles.length > 0 ? currentPage : 0}/${totalPages}`;
         }
 
-        // Renderizar os controles de paginação
+        /**
+         * Renderiza os botões de paginação.
+         */
         function renderPagination() {
-            paginationControls.innerHTML = ''; // Limpa os controles existentes
+            paginationControls.innerHTML = '';
             const totalPages = Math.ceil(filteredMovieTitles.length / moviesPerPage);
 
             if (totalPages <= 1) {
-                paginationControls.style.display = 'none'; // Oculta se houver apenas 1 página ou nenhuma
+                paginationControls.style.display = 'none';
                 return;
             }
 
-            paginationControls.style.display = 'flex'; // Garante que esteja visível
+            paginationControls.style.display = 'flex';
 
             // Botão "Anterior"
             const prevButton = document.createElement('button');
@@ -1370,16 +1372,17 @@
                 if (currentPage > 1) {
                     currentPage--;
                     displayMovies();
-                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Volta para o topo da página
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Rola para o topo da página
                 }
             });
             paginationControls.appendChild(prevButton);
 
             // Botões de números de página
-            const maxPageButtons = 5; // Número máximo de botões de página visíveis
+            const maxPageButtons = 5; // Número máximo de botões de página a serem exibidos
             let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
             let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
+            // Ajusta o início se o final for muito próximo do total
             if (endPage - startPage + 1 < maxPageButtons) {
                 startPage = Math.max(1, endPage - maxPageButtons + 1);
             }
@@ -1388,12 +1391,12 @@
                 const pageButton = document.createElement('button');
                 pageButton.textContent = i;
                 if (i === currentPage) {
-                    pageButton.classList.add('active');
+                    pageButton.classList.add('active'); // Adiciona classe 'active' para a página atual
                 }
                 pageButton.addEventListener('click', () => {
                     currentPage = i;
                     displayMovies();
-                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Volta para o topo da página
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
                 paginationControls.appendChild(pageButton);
             }
@@ -1406,41 +1409,41 @@
                 if (currentPage < totalPages) {
                     currentPage++;
                     displayMovies();
-                    window.scrollTo({ top: 0, behavior: 'smooth' }); // Volta para o topo da página
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             });
             paginationControls.appendChild(nextButton);
         }
 
-        // Event listeners
+        // Adiciona listeners para os controles de busca e filtro
         searchInput.addEventListener('input', filterAndDisplayMovies);
         resolutionFilter.addEventListener('change', filterAndDisplayMovies);
         formatFilter.addEventListener('change', filterAndDisplayMovies);
         audioFilter.addEventListener('change', filterAndDisplayMovies);
 
-        // Event listeners do Modal
+        // Adiciona listeners para o modal
         closeButton.addEventListener('click', () => {
             movieModal.style.display = 'none';
             resetMediaPlayer(); // Reseta o player ao fechar o modal
         });
 
-        // Fechar o modal ao clicar fora do conteúdo
+        // Fecha o modal se clicar fora do conteúdo
         movieModal.addEventListener('click', (event) => {
             if (event.target === movieModal) {
                 movieModal.style.display = 'none';
-                resetMediaPlayer(); // Reseta o player ao fechar o modal
+                resetMediaPlayer();
             }
         });
 
-        // Fechar o modal com a tecla ESC
+        // Fecha o modal com a tecla ESC
         window.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && movieModal.style.display === 'flex') {
                 movieModal.style.display = 'none';
-                resetMediaPlayer(); // Reseta o player ao fechar o modal
+                resetMediaPlayer();
             }
         });
 
-        // Adicionar event listener para os botões "Assistir" dentro do modal (delegação de eventos)
+        // Adiciona listener para os botões de "Assistir" dentro do modal
         modalVersions.addEventListener('click', (event) => {
             const target = event.target;
             if (target.classList.contains('watch-btn')) {
@@ -1448,6 +1451,7 @@
                 if (magnetURI) {
                     watchTorrent(magnetURI);
                 } else {
+                    // Exibe uma mensagem de erro se o link magnet não for encontrado
                     playerMessage.textContent = 'Magnet link não encontrado para esta versão.';
                     playerMessage.classList.remove('loading-spinner');
                     modalVideoPlayer.style.display = 'flex';
@@ -1456,7 +1460,7 @@
             }
         });
 
-        // Carregar dados quando a página carregar
+        // Carrega os filmes quando o DOM estiver completamente carregado
         window.addEventListener('DOMContentLoaded', loadMovies);
     </script>
 </body>
