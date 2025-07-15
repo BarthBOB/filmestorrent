@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Starck Filmes - Biblioteca Digital</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Removido: <script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js"></script> -->
     <style>
         /* Estilos globais */
         * {
@@ -605,7 +604,6 @@
                     <div id="modal-versions" class="versions-section"></div>
                 </div>
             </div>
-            <!-- Removido: <div id="modal-video-player" class="modal-video-player"> ... </div> -->
         </div>
     </div>
 
@@ -646,8 +644,6 @@
         const modalDetails = document.getElementById('modal-details');
         const modalSynopsis = document.getElementById('modal-synopsis');
         const modalVersions = document.getElementById('modal-versions');
-
-        // Removido: webtorrentClient, currentTorrent, torrentTimeout
 
         /**
          * Limpa o título do filme removendo sufixos de torrent e informações entre parênteses.
@@ -902,10 +898,10 @@
         function createVersionItemHTML(version, index) {
             // URL base do seu servidor local
             const localServerBaseUrl = "http://45.235.53.234:27020";
-            // Constrói a URL para o botão "Assistir", passando o link magnet como parâmetro
+            // Constrói a URL para o botão "Assistir", passando o link magnet como parâmetro para a rota principal do servidor
             const watchUrl = version.Magnet ? `${localServerBaseUrl}/?magnet=${encodeURIComponent(version.Magnet)}` : '#';
 
-            // Botão de assistir agora é um link direto para o servidor local
+            // Botão de assistir agora é um link direto para a página do player no servidor local
             const watchButton = version.Magnet ? `<a href="${watchUrl}" target="_blank" class="download-btn secondary">▶️ Assistir</a>` : '';
 
             return `
@@ -927,8 +923,6 @@
                 </div>
             `;
         }
-
-        // Removido: watchTorrent, resetMediaPlayer, renderFileSelectionUI, playSelectedFile
 
         /**
          * Filtra os filmes com base nos termos de busca e nos filtros selecionados,
@@ -1050,14 +1044,12 @@
         // Adiciona listeners para o modal
         closeButton.addEventListener('click', () => {
             movieModal.style.display = 'none';
-            // Removido: resetMediaPlayer(); // Não é mais necessário com a remoção do WebTorrent
         });
 
         // Fecha o modal se clicar fora do conteúdo
         movieModal.addEventListener('click', (event) => {
             if (event.target === movieModal) {
                 movieModal.style.display = 'none';
-                // Removido: resetMediaPlayer();
             }
         });
 
@@ -1065,11 +1057,8 @@
         window.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && movieModal.style.display === 'flex') {
                 movieModal.style.display = 'none';
-                // Removido: resetMediaPlayer();
             }
         });
-
-        // Removido: Adiciona listener para os botões de "Assistir" dentro do modal (agora são links diretos)
 
         // Carrega os filmes quando o DOM estiver completamente carregado
         window.addEventListener('DOMContentLoaded', loadMovies);
