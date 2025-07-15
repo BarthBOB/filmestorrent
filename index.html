@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Starck Filmes - Biblioteca Digital</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js"></script>
+    <!-- Removido: <script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js"></script> -->
     <style>
         /* Estilos globais */
         * {
@@ -391,96 +391,6 @@
             box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
         }
 
-        /* Estilos do player de vídeo no modal */
-        .modal-video-player {
-            margin-top: 1.5rem;
-            background-color: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            display: none; /* Escondido por padrão */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
-            position: relative;
-        }
-
-        .modal-video-player video {
-            width: 100%;
-            height: auto;
-            max-height: 60vh;
-            background-color: #000;
-            display: block;
-        }
-
-        .modal-video-player .player-message {
-            color: #ccc;
-            font-size: 1rem;
-            padding: 1rem;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            min-height: 50px;
-        }
-
-        .player-message.loading-spinner::after {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #4ecdc4;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-            margin-left: 5px;
-        }
-
-        .file-selection-area {
-            padding: 1rem;
-            width: 100%;
-            max-height: 400px;
-            overflow-y: auto;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .file-selection-area label {
-            display: block;
-            padding: 0.5rem;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            border-radius: 4px;
-        }
-
-        .file-selection-area label:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .file-selection-area input[type="radio"] {
-            margin-right: 0.5rem;
-        }
-
-        .play-selected-btn {
-            padding: 0.8rem 1.5rem;
-            background: linear-gradient(45deg, #4ecdc4, #44a08d);
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
-
-        .play-selected-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
-        }
-
         /* Estilos de carregamento e sem resultados */
         .loading {
             text-align: center;
@@ -695,15 +605,7 @@
                     <div id="modal-versions" class="versions-section"></div>
                 </div>
             </div>
-            <div id="modal-video-player" class="modal-video-player">
-                <div class="player-message"></div>
-                <div id="file-selection-area" class="file-selection-area" style="display: none;">
-                    <h4>Selecione um arquivo para assistir:</h4>
-                    <div id="file-list"></div>
-                    <button id="play-selected-file-btn" class="play-selected-btn" style="display: none;">▶️ Assistir Selecionado</button>
-                </div>
-                <video id="webtorrent-video" controls autoplay muted style="display: none;"></video>
-            </div>
+            <!-- Removido: <div id="modal-video-player" class="modal-video-player"> ... </div> -->
         </div>
     </div>
 
@@ -744,16 +646,8 @@
         const modalDetails = document.getElementById('modal-details');
         const modalSynopsis = document.getElementById('modal-synopsis');
         const modalVersions = document.getElementById('modal-versions');
-        const modalVideoPlayer = document.getElementById('modal-video-player');
-        const playerMessage = modalVideoPlayer.querySelector('.player-message');
-        const fileSelectionArea = document.getElementById('file-selection-area');
-        const fileListDiv = document.getElementById('file-list');
-        const playSelectedFileBtn = document.getElementById('play-selected-file-btn');
-        const webtorrentVideoElement = document.getElementById('webtorrent-video');
 
-        let webtorrentClient = null; // Instância do cliente WebTorrent
-        let currentTorrent = null; // O torrent atualmente ativo
-        let torrentTimeout = null; // Timeout para conexão do torrent
+        // Removido: webtorrentClient, currentTorrent, torrentTimeout
 
         /**
          * Limpa o título do filme removendo sufixos de torrent e informações entre parênteses.
@@ -996,49 +890,7 @@
             });
             modalVersions.innerHTML = versionsHtml;
 
-            resetMediaPlayer(); // Reseta o player de vídeo ao abrir um novo modal
-
             movieModal.style.display = 'flex'; // Exibe o modal
-        }
-
-        /**
-         * Reseta o estado do player de vídeo e do cliente WebTorrent.
-         * Isso é importante para liberar recursos e preparar para um novo streaming.
-         */
-        function resetMediaPlayer() {
-            modalVideoPlayer.style.display = 'none';
-            playerMessage.textContent = '';
-            playerMessage.classList.remove('loading-spinner');
-            fileSelectionArea.style.display = 'none';
-            fileListDiv.innerHTML = '';
-            playSelectedFileBtn.style.display = 'none';
-            
-            webtorrentVideoElement.pause();
-            webtorrentVideoElement.src = ''; // Limpa a fonte do vídeo
-            webtorrentVideoElement.load(); // Recarrega o elemento de vídeo
-            webtorrentVideoElement.style.display = 'none';
-            webtorrentVideoElement.muted = true; // Garante que o vídeo comece mudo
-
-            // Limpa o timeout de conexão, se houver
-            if (torrentTimeout) {
-                clearTimeout(torrentTimeout);
-                torrentTimeout = null;
-            }
-
-            // Destrói o cliente WebTorrent se ele existir
-            if (webtorrentClient) {
-                webtorrentClient.destroy(() => {
-                    console.log('WebTorrent client destroyed.');
-                    webtorrentClient = null;
-                    currentTorrent = null;
-                });
-            } else {
-                // Se não houver cliente, apenas reseta as variáveis
-                webtorrentClient = null;
-                currentTorrent = null;
-            }
-            // Garante que os detalhes do filme sejam visíveis novamente
-            document.querySelector('.modal-movie-details').style.display = 'flex';
         }
 
         /**
@@ -1048,8 +900,13 @@
          * @returns {string} O HTML do item de versão.
          */
         function createVersionItemHTML(version, index) {
-            // Botão de assistir só é renderizado se houver um link magnet
-            const watchButton = version.Magnet ? `<button class="download-btn secondary watch-btn" data-magnet="${version.Magnet}">▶️ Assistir</button>` : '';
+            // URL base do seu servidor local
+            const localServerBaseUrl = "http://45.235.53.234:27020";
+            // Constrói a URL para o botão "Assistir", passando o link magnet como parâmetro
+            const watchUrl = version.Magnet ? `${localServerBaseUrl}/?magnet=${encodeURIComponent(version.Magnet)}` : '#';
+
+            // Botão de assistir agora é um link direto para o servidor local
+            const watchButton = version.Magnet ? `<a href="${watchUrl}" target="_blank" class="download-btn secondary">▶️ Assistir</a>` : '';
 
             return `
                 <div class="version-item">
@@ -1071,238 +928,7 @@
             `;
         }
 
-        /**
-         * Inicia o streaming de um torrent usando WebTorrent.
-         * @param {string} magnetURI O link magnet do torrent.
-         */
-        function watchTorrent(magnetURI) {
-            if (!magnetURI || !magnetURI.startsWith('magnet:')) {
-                playerMessage.textContent = 'Link Magnet inválido. Não é possível iniciar o streaming.';
-                return;
-            }
-
-            // Oculta os detalhes do filme e mostra o player
-            document.querySelector('.modal-movie-details').style.display = 'none';
-            modalVideoPlayer.style.display = 'flex';
-            playerMessage.textContent = 'Iniciando streaming... Aguarde.';
-            playerMessage.classList.add('loading-spinner');
-            webtorrentVideoElement.style.display = 'none';
-
-            // Destrói o cliente existente antes de criar um novo
-            if (webtorrentClient) {
-                webtorrentClient.destroy();
-            }
-
-            // Define um timeout para caso a conexão demore muito
-            const connectionTimeout = setTimeout(() => {
-                if (!currentTorrent || !currentTorrent.ready) {
-                    playerMessage.textContent = 'Timeout: Não foi possível conectar. Verifique sua conexão ou tente outro arquivo.';
-                    playerMessage.classList.remove('loading-spinner');
-                    resetMediaPlayer();
-                }
-            }, 15000); // 15 segundos de timeout
-
-            // Inicializa o cliente WebTorrent com STUN servers para melhor conectividade P2P
-            webtorrentClient = new WebTorrent({
-                tracker: {
-                    rtcConfig: {
-                        iceServers: [
-                            { urls: 'stun:stun.l.google.com:19302' },
-                            { urls: 'stun:stun1.l.google.com:19302' },
-                            { urls: 'stun:stun2.l.google.com:19302' }
-                        ]
-                    }
-                }
-            });
-
-            // Adiciona o torrent ao cliente WebTorrent
-            webtorrentClient.add(magnetURI, torrent => {
-                clearTimeout(connectionTimeout); // Limpa o timeout assim que o torrent é adicionado
-                currentTorrent = torrent;
-                playerMessage.textContent = 'Torrent adicionado. Buscando metadados e pares...';
-                playerMessage.classList.add('loading-spinner');
-                console.log('Torrent adicionado:', torrent.name);
-
-                // Evento 'ready': quando os metadados do torrent são carregados
-                torrent.on('ready', () => {
-                    playerMessage.textContent = 'Metadados carregados. Encontrando arquivos de vídeo...';
-                    playerMessage.classList.add('loading-spinner');
-                    console.log('Torrent is ready:', torrent.name);
-
-                    // Filtra os arquivos de vídeo compatíveis
-                    const videoFiles = torrent.files.filter(file => {
-                        const lowerCaseName = file.name.toLowerCase();
-                        return lowerCaseName.endsWith('.mp4') || lowerCaseName.endsWith('.webm') ||
-                               lowerCaseName.endsWith('.ogg') || lowerCaseName.endsWith('.mkv') ||
-                               lowerCaseName.endsWith('.avi') || lowerCaseName.endsWith('.mov') ||
-                               lowerCaseName.endsWith('.flv') || lowerCaseName.endsWith('.wmv');
-                    });
-
-                    if (videoFiles.length > 1) {
-                        renderFileSelectionUI(videoFiles); // Se houver múltiplos, permite seleção
-                    } else if (videoFiles.length === 1) {
-                        playSelectedFile(videoFiles[0]); // Se houver um, reproduz diretamente
-                    } else {
-                        // Nenhum arquivo de vídeo encontrado
-                        playerMessage.textContent = 'Nenhum arquivo de vídeo compatível encontrado neste torrent.';
-                        playerMessage.classList.remove('loading-spinner');
-                        webtorrentVideoElement.style.display = 'none';
-                        fileSelectionArea.style.display = 'none';
-                        playSelectedFileBtn.style.display = 'none';
-                    }
-                });
-
-                // Evento 'error': para erros relacionados ao torrent
-                torrent.on('error', (err) => {
-                    console.error('Torrent Error:', err);
-                    playerMessage.textContent = `Erro no torrent: ${err.message || 'Ocorreu um erro no torrent.'}`;
-                    playerMessage.classList.remove('loading-spinner');
-                    resetMediaPlayer();
-                });
-
-                // Evento 'warning': para avisos do torrent
-                torrent.on('warning', (warning) => {
-                    console.warn('Torrent Warning:', warning);
-                });
-
-                // Evento 'download': para atualizar o progresso do download
-                torrent.on('download', () => {
-                    const progress = (torrent.progress * 100).toFixed(1);
-                    const downloaded = (torrent.downloaded / (1024 * 1024)).toFixed(2);
-                    const total = (torrent.length / (1024 * 1024)).toFixed(2);
-                    const downloadSpeed = (torrent.downloadSpeed / (1024 * 1024)).toFixed(2);
-                    // Atualiza a mensagem apenas se o vídeo não estiver sendo reproduzido ativamente
-                    if (webtorrentVideoElement.paused || webtorrentVideoElement.ended || playerMessage.textContent.includes('Baixando:') || playerMessage.textContent.includes('Preparando vídeo...')) {
-                        playerMessage.textContent = `Baixando: ${progress}% (${downloaded}/${total} MB) - Velocidade: ${downloadSpeed} MB/s - Pares: ${torrent.numPeers}`;
-                        playerMessage.classList.add('loading-spinner');
-                    }
-                });
-
-                // Evento 'done': quando o download do torrent é concluído
-                torrent.on('done', () => {
-                    console.log('Torrent download finished!');
-                    if (playerMessage.textContent.includes('Baixando:')) {
-                        playerMessage.textContent = 'Download completo!';
-                        playerMessage.classList.remove('loading-spinner');
-                    }
-                });
-            }); 
-        }
-
-        /**
-         * Renderiza a interface de seleção de arquivo quando há múltiplos arquivos de vídeo no torrent.
-         * @param {WebTorrent.File[]} files Os arquivos de vídeo disponíveis.
-         */
-        function renderFileSelectionUI(files) {
-            fileSelectionArea.style.display = 'block';
-            fileListDiv.innerHTML = '';
-            playSelectedFileBtn.style.display = 'block';
-            playerMessage.textContent = 'Selecione um arquivo de vídeo para assistir:';
-            playerMessage.classList.remove('loading-spinner');
-            webtorrentVideoElement.style.display = 'none';
-
-            files.forEach((file, index) => {
-                const label = document.createElement('label');
-                label.innerHTML = `<input type="radio" name="torrent-file" value="${index}" ${index === 0 ? 'checked' : ''}> ${file.name} (${(file.length / (1024 * 1024)).toFixed(2)} MB)`;
-                fileListDiv.appendChild(label);
-            });
-
-            playSelectedFileBtn.onclick = () => {
-                const selectedIndex = document.querySelector('input[name="torrent-file"]:checked')?.value;
-                if (selectedIndex !== undefined) {
-                    playSelectedFile(files[selectedIndex]);
-                } else {
-                    playerMessage.textContent = 'Por favor, selecione um arquivo.';
-                }
-            };
-        }
-
-        /**
-         * Reproduz o arquivo de vídeo selecionado usando o elemento <video>.
-         * @param {WebTorrent.File} file O arquivo WebTorrent a ser reproduzido.
-         */
-        function playSelectedFile(file) {
-            fileSelectionArea.style.display = 'none';
-            playSelectedFileBtn.style.display = 'none';
-            playerMessage.textContent = 'Preparando vídeo... (bufferizando)';
-            playerMessage.classList.add('loading-spinner');
-            webtorrentVideoElement.style.display = 'block';
-
-            // Limpa a fonte e recarrega para garantir que o vídeo anterior não interfira
-            webtorrentVideoElement.src = '';
-            webtorrentVideoElement.load();
-
-            // Renderiza o arquivo WebTorrent diretamente no elemento de vídeo
-            file.renderTo(webtorrentVideoElement, {
-                autoplay: true,
-                controls: true,
-                muted: true // Começa mudo para evitar problemas de autoplay em navegadores
-            }, (err, videoElement) => {
-                if (err) {
-                    console.error('Erro ao renderizar vídeo:', err);
-                    playerMessage.textContent = 'Erro ao carregar o vídeo. O arquivo pode estar corrompido ou o formato não é suportado pelo seu navegador.';
-                    playerMessage.classList.remove('loading-spinner');
-                    webtorrentVideoElement.style.display = 'none';
-                    return;
-                }
-                playerMessage.textContent = ''; // Limpa a mensagem de carregamento
-                playerMessage.classList.remove('loading-spinner');
-
-                // Evento para quando o vídeo está pronto para ser reproduzido
-                videoElement.addEventListener('canplay', () => {
-                    if (videoElement.muted) {
-                        playerMessage.textContent = 'Clique no vídeo para iniciar a reprodução com áudio.';
-                        // Tenta tocar automaticamente (pode ser bloqueado pelo navegador se não for mudo)
-                        videoElement.play().catch(e => {
-                            console.warn('Autoplay with sound prevented:', e);
-                        });
-                    }
-                }, { once: true }); // Executa apenas uma vez
-
-                // Eventos de estado do vídeo
-                videoElement.addEventListener('playing', () => {
-                    playerMessage.textContent = 'Reproduzindo!';
-                    playerMessage.classList.remove('loading-spinner');
-                });
-
-                videoElement.addEventListener('waiting', () => {
-                    playerMessage.textContent = 'Bufferizando...';
-                    playerMessage.classList.add('loading-spinner');
-                });
-
-                videoElement.addEventListener('stalled', () => {
-                    playerMessage.textContent = 'Conexão instável... Tentando reconectar.';
-                    playerMessage.classList.add('loading-spinner');
-                });
-
-                // Manipulação de erros do elemento de vídeo
-                videoElement.addEventListener('error', (e) => {
-                    console.error('Erro no elemento de vídeo:', e);
-                    let errorMessage = 'Erro de reprodução. O arquivo pode estar corrompido ou o formato não é suportado.';
-                    if (e.target && e.target.error) {
-                        switch (e.target.error.code) {
-                            case e.target.error.MEDIA_ERR_ABORTED:
-                                errorMessage = 'A reprodução do vídeo foi abortada.';
-                                break;
-                            case e.target.error.MEDIA_ERR_NETWORK:
-                                errorMessage = 'Erro de rede. Verifique sua conexão.';
-                                break;
-                            case e.target.error.MEDIA_ERR_DECODE:
-                                errorMessage = 'Erro de decodificação. O formato do vídeo pode não ser suportado.';
-                                break;
-                            case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                                errorMessage = 'O formato do vídeo não é suportado pelo seu navegador.';
-                                break;
-                            default:
-                                errorMessage = 'Erro desconhecido na reprodução do vídeo.';
-                                break;
-                        }
-                    }
-                    playerMessage.textContent = errorMessage;
-                    playerMessage.classList.remove('loading-spinner');
-                });
-            });
-        }
+        // Removido: watchTorrent, resetMediaPlayer, renderFileSelectionUI, playSelectedFile
 
         /**
          * Filtra os filmes com base nos termos de busca e nos filtros selecionados,
@@ -1424,14 +1050,14 @@
         // Adiciona listeners para o modal
         closeButton.addEventListener('click', () => {
             movieModal.style.display = 'none';
-            resetMediaPlayer(); // Reseta o player ao fechar o modal
+            // Removido: resetMediaPlayer(); // Não é mais necessário com a remoção do WebTorrent
         });
 
         // Fecha o modal se clicar fora do conteúdo
         movieModal.addEventListener('click', (event) => {
             if (event.target === movieModal) {
                 movieModal.style.display = 'none';
-                resetMediaPlayer();
+                // Removido: resetMediaPlayer();
             }
         });
 
@@ -1439,26 +1065,11 @@
         window.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && movieModal.style.display === 'flex') {
                 movieModal.style.display = 'none';
-                resetMediaPlayer();
+                // Removido: resetMediaPlayer();
             }
         });
 
-        // Adiciona listener para os botões de "Assistir" dentro do modal
-        modalVersions.addEventListener('click', (event) => {
-            const target = event.target;
-            if (target.classList.contains('watch-btn')) {
-                const magnetURI = target.dataset.magnet;
-                if (magnetURI) {
-                    watchTorrent(magnetURI);
-                } else {
-                    // Exibe uma mensagem de erro se o link magnet não for encontrado
-                    playerMessage.textContent = 'Magnet link não encontrado para esta versão.';
-                    playerMessage.classList.remove('loading-spinner');
-                    modalVideoPlayer.style.display = 'flex';
-                    document.querySelector('.modal-movie-details').style.display = 'none';
-                }
-            }
-        });
+        // Removido: Adiciona listener para os botões de "Assistir" dentro do modal (agora são links diretos)
 
         // Carrega os filmes quando o DOM estiver completamente carregado
         window.addEventListener('DOMContentLoaded', loadMovies);
