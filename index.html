@@ -390,6 +390,57 @@
             box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
         }
 
+        /* Estilos para a nova seção de seleção de arquivos */
+        .file-selection-area {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .file-selection-area h4 {
+            font-size: 1rem;
+            color: #4ecdc4;
+            margin-bottom: 0.8rem;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .file-item-btn {
+            padding: 0.6rem 1rem;
+            background: rgba(78, 205, 196, 0.1);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-item-btn:hover {
+            background: rgba(78, 205, 196, 0.2);
+            transform: translateX(5px);
+        }
+
+        .file-item-btn span {
+            flex-grow: 1;
+        }
+
+        .file-item-btn .play-icon {
+            margin-left: 0.5rem;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+
         /* Estilos de carregamento e sem resultados */
         .loading {
             text-align: center;
@@ -657,6 +708,18 @@
         }
 
         /**
+         * Verifica se uma versão de filme parece ser parte de uma série.
+         * Esta é uma detecção heurística baseada no campo 'Versão'.
+         * @param {Object} version A versão do filme.
+         * @returns {boolean} True se parece ser uma série, false caso contrário.
+         */
+        function isSeriesVersion(version) {
+            const versionText = version.Versão || '';
+            // Exemplos de padrões para séries: S01E01, T01E01, Temporada 1 Episódio 1
+            return /(S\d{2}E\d{2}|T\d{2}E\d{2}|Temporada \d+ Episódio \d+)/i.test(versionText);
+        }
+
+        /**
          * Carrega os dados dos filmes a partir de arquivos CSV.
          * Combina os dados de duas partes e os agrupa por título.
          */
@@ -716,19 +779,26 @@
                     return; // Sai da função se não houver dados
                 }
 
-                // Agrupa os filmes por título limpo
+                // Agrupa os filmes por título limpo e adiciona a flag isSeries
                 groupedMovies = {};
                 moviesData.forEach(movie => {
                     const cleanedTitle = cleanTitle(movie.Título);
                     if (!groupedMovies[cleanedTitle]) {
-                        groupedMovies[cleanedTitle] = [];
+                        groupedMovies[cleanedTitle] = {
+                            versions: [],
+                            isSeries: false // Assume que não é série inicialmente
+                        };
                     }
-                    groupedMovies[cleanedTitle].push(movie);
+                    groupedMovies[cleanedTitle].versions.push(movie);
+                    // Se qualquer versão for uma série, marca o grupo como série
+                    if (isSeriesVersion(movie)) {
+                        groupedMovies[cleanedTitle].isSeries = true;
+                    }
                 });
 
                 // Opcional: Ordena as versões de cada filme por resolução (maior para menor)
                 Object.keys(groupedMovies).forEach(title => {
-                    groupedMovies[title].sort((a, b) => {
+                    groupedMovies[title].versions.sort((a, b) => {
                         const resolutionOrder = { '4K': 4, '2160p': 4, '1080p': 3, '720p': 2, '480p': 1 };
                         return (resolutionOrder[b.Resolução] || 0) - (resolutionOrder[a.Resolução] || 0);
                     });
@@ -813,8 +883,8 @@
             const moviesToDisplay = filteredMovieTitles.slice(startIndex, endIndex);
 
             moviesToDisplay.forEach(title => {
-                const movieVersions = groupedMovies[title];
-                const movieCard = createMovieCard(title, movieVersions);
+                const movieGroup = groupedMovies[title];
+                const movieCard = createMovieCard(title, movieGroup.versions, movieGroup.isSeries);
                 moviesContainer.appendChild(movieCard);
             });
 
@@ -826,15 +896,17 @@
          * Cria um elemento de cartão de filme para exibição na grade.
          * @param {string} title O título limpo do filme.
          * @param {Object[]} versions As versões disponíveis do filme.
+         * @param {boolean} isSeries Indica se o filme é uma série.
          * @returns {HTMLDivElement} O elemento do cartão de filme.
          */
-        function createMovieCard(title, versions) {
+        function createMovieCard(title, versions, isSeries) {
             const primaryVersion = versions[0]; // Usa a primeira versão para o pôster e detalhes principais
             const hasMultipleVersions = versions.length > 1;
             
             const card = document.createElement('div');
             card.className = 'movie-card';
             card.dataset.title = title; // Armazena o título para fácil referência
+            card.dataset.isSeries = isSeries; // Armazena se é série
 
             const posterUrl = primaryVersion['Poster Página']; // Assumindo que esta coluna contém a URL do pôster
 
@@ -857,12 +929,14 @@
          * @param {string} title O título do filme a ser exibido no modal.
          */
         function openMovieModal(title) {
-            const movieVersions = groupedMovies[title];
-            if (!movieVersions || movieVersions.length === 0) {
+            const movieGroup = groupedMovies[title];
+            if (!movieGroup || movieGroup.versions.length === 0) {
                 console.error('Dados do filme não encontrados para:', title);
                 return;
             }
 
+            const movieVersions = movieGroup.versions;
+            const isSeries = movieGroup.isSeries;
             const primaryVersion = movieVersions[0]; // Usa a primeira versão para os detalhes principais do modal
             const posterUrl = primaryVersion['Poster Página'];
 
@@ -882,9 +956,14 @@
             // Renderiza as diferentes versões do filme
             let versionsHtml = '';
             movieVersions.forEach((version, index) => {
-                versionsHtml += createVersionItemHTML(version, index);
+                versionsHtml += createVersionItemHTML(version, index, isSeries);
             });
             modalVersions.innerHTML = versionsHtml;
+
+            // Adiciona listeners para os botões de seleção de arquivo
+            modalVersions.querySelectorAll('.select-file-btn').forEach(button => {
+                button.addEventListener('click', handleSelectEpisodeClick);
+            });
 
             movieModal.style.display = 'flex'; // Exibe o modal
         }
@@ -893,16 +972,23 @@
          * Cria o HTML para um item de versão de filme no modal.
          * @param {Object} version Os dados da versão do filme.
          * @param {number} index O índice da versão.
+         * @param {boolean} isSeries Indica se o filme principal é uma série.
          * @returns {string} O HTML do item de versão.
          */
-        function createVersionItemHTML(version, index) {
-            // URL base do seu servidor local
+        function createVersionItemHTML(version, index, isSeries) {
             const localServerBaseUrl = "http://45.235.53.234:27020";
-            // Constrói a URL para o botão "Assistir", passando o link magnet como parâmetro para a rota principal do servidor
-            const watchUrl = version.Magnet ? `${localServerBaseUrl}/?magnet=${encodeURIComponent(version.Magnet)}` : '#';
+            let watchButtonHtml = '';
 
-            // Botão de assistir agora é um link direto para a página do player no servidor local
-            const watchButton = version.Magnet ? `<a href="${watchUrl}" target="_blank" class="download-btn secondary">▶️ Assistir</a>` : '';
+            if (version.Magnet) {
+                if (isSeries) {
+                    // Para séries, o botão abre a seleção de arquivos
+                    watchButtonHtml = `<button class="download-btn secondary select-file-btn" data-magnet="${encodeURIComponent(version.Magnet)}" data-version-index="${index}">▶️ Selecionar Episódio</button>`;
+                } else {
+                    // Para filmes únicos, o botão "Assistir" funciona como antes
+                    const watchUrl = `${localServerBaseUrl}/?magnet=${encodeURIComponent(version.Magnet)}`;
+                    watchButtonHtml = `<a href="${watchUrl}" target="_blank" class="download-btn secondary">▶️ Assistir</a>`;
+                }
+            }
 
             return `
                 <div class="version-item">
@@ -917,12 +1003,110 @@
                     ${version.Versão ? `<div class="version-description">${version.Versão}</div>` : ''}
                     <div class="download-buttons">
                         ${version.Magnet ? `<a href="${version.Magnet}" class="download-btn">🧲 Download Magnet</a>` : ''}
-                        ${watchButton}
+                        ${watchButtonHtml}
                         ${version['URL Filme'] ? `<a href="${version['URL Filme']}" target="_blank" class="download-btn secondary">🎬 Ver Detalhes</a>` : ''}
+                    </div>
+                    <!-- Área para seleção de arquivos/episódios, inicialmente oculta -->
+                    <div class="file-selection-area" id="file-selection-area-${index}" style="display: none;">
+                        <h4>Selecione um arquivo:</h4>
+                        <div class="file-list" id="file-list-${index}">
+                            <!-- Arquivos serão inseridos aqui dinamicamente -->
+                        </div>
                     </div>
                 </div>
             `;
         }
+
+        /**
+         * Lida com o clique no botão "Selecionar Episódio".
+         * @param {Event} event O evento de clique.
+         */
+        function handleSelectEpisodeClick(event) {
+            const button = event.currentTarget;
+            const magnetLink = decodeURIComponent(button.dataset.magnet);
+            const versionIndex = button.dataset.versionIndex;
+            const fileSelectionArea = document.getElementById(`file-selection-area-${versionIndex}`);
+            const fileListContainer = document.getElementById(`file-list-${versionIndex}`);
+
+            // Toggle visibility
+            if (fileSelectionArea.style.display === 'none') {
+                fileSelectionArea.style.display = 'block';
+                // Populate the list only if it's not already populated
+                if (fileListContainer.children.length === 0) {
+                    populateEpisodeList(magnetLink, versionIndex);
+                }
+            } else {
+                fileSelectionArea.style.display = 'none';
+            }
+        }
+
+        /**
+         * Simula a obtenção de uma lista de arquivos de um torrent e os renderiza.
+         * EM UM CENÁRIO REAL, ESTA FUNÇÃO FARIA UMA CHAMADA À SUA API LOCAL.
+         * @param {string} magnetLink O link magnet do torrent.
+         * @param {number} versionIndex O índice da versão do filme.
+         */
+        function populateEpisodeList(magnetLink, versionIndex) {
+            const fileListContainer = document.getElementById(`file-list-${versionIndex}`);
+            fileListContainer.innerHTML = '<p style="color: #a0a0a0; font-style: italic;">Carregando arquivos...</p>'; // Loading message
+
+            // Simulação de arquivos de torrent (substitua por uma chamada real à API)
+            const simulatedFiles = [
+                `Episódio 01 - Nome do Episódio.mp4`,
+                `Episódio 02 - Outro Episódio.mp4`,
+                `Episódio 03 - Final da Temporada.mp4`,
+                `Episódio 04 - Bônus.mp4`
+            ];
+
+            // Em um ambiente real, você faria algo como:
+            // fetch(`${localServerBaseUrl}/list-files?magnet=${encodeURIComponent(magnetLink)}`)
+            //     .then(response => response.json())
+            //     .then(files => {
+            //         fileListContainer.innerHTML = ''; // Clear loading message
+            //         if (files.length === 0) {
+            //             fileListContainer.innerHTML = '<p style="color: #a0a0a0;">Nenhum arquivo de vídeo encontrado neste torrent.</p>';
+            //             return;
+            //         }
+            //         files.forEach(fileName => {
+            //             const fileButton = document.createElement('button');
+            //             fileButton.className = 'file-item-btn';
+            //             fileButton.innerHTML = `<span>${fileName}</span> <span class="play-icon">▶️</span>`;
+            //             fileButton.addEventListener('click', () => {
+            //                 const localServerBaseUrl = "http://45.235.53.234:27020";
+            //                 const watchUrl = `${localServerBaseUrl}/?magnet=${encodeURIComponent(magnetLink)}&fileName=${encodeURIComponent(fileName)}`;
+            //                 window.open(watchUrl, '_blank');
+            //             });
+            //             fileListContainer.appendChild(fileButton);
+            //         });
+            //     })
+            //     .catch(error => {
+            //         console.error('Erro ao listar arquivos do torrent:', error);
+            //         fileListContainer.innerHTML = '<p style="color: #ff6b6b;">Erro ao carregar arquivos.</p>';
+            //     });
+
+            // Usando os arquivos simulados para demonstração:
+            setTimeout(() => { // Simula um pequeno atraso de rede
+                fileListContainer.innerHTML = ''; // Limpa a mensagem de carregamento
+                if (simulatedFiles.length === 0) {
+                    fileListContainer.innerHTML = '<p style="color: #a0a0a0;">Nenhum arquivo de vídeo encontrado neste torrent.</p>';
+                    return;
+                }
+                simulatedFiles.forEach(fileName => {
+                    const fileButton = document.createElement('button');
+                    fileButton.className = 'file-item-btn';
+                    fileButton.innerHTML = `<span>${fileName}</span> <span class="play-icon">▶️</span>`;
+                    fileButton.addEventListener('click', () => {
+                        const localServerBaseUrl = "http://45.235.53.234:27020";
+                        // A URL final que seu servidor precisaria entender para reproduzir um arquivo específico
+                        const watchUrl = `${localServerBaseUrl}/?magnet=${encodeURIComponent(magnetLink)}&fileName=${encodeURIComponent(fileName)}`;
+                        window.open(watchUrl, '_blank');
+                        console.log(`Tentando assistir: ${fileName} do torrent: ${magnetLink}`);
+                    });
+                    fileListContainer.appendChild(fileButton);
+                });
+            }, 500); // Atraso de 0.5 segundos
+        }
+
 
         /**
          * Filtra os filmes com base nos termos de busca e nos filtros selecionados,
@@ -935,11 +1119,12 @@
             const audioValue = audioFilter.value;
 
             filteredMovieTitles = Object.keys(groupedMovies).filter(title => {
-                const versions = groupedMovies[title];
+                const movieGroup = groupedMovies[title];
+                const versions = movieGroup.versions;
                 
                 // Verifica se o título ou a sinopse de alguma versão corresponde ao termo de busca
                 const matchesSearch = title.toLowerCase().includes(searchTerm) ||
-                                     versions.some(v => v.Sinopse && v.Sinopse.toLowerCase().includes(searchTerm));
+                                      versions.some(v => v.Sinopse && v.Sinopse.toLowerCase().includes(searchTerm));
                 
                 // Verifica se alguma versão corresponde aos filtros selecionados
                 const matchesFilters = versions.some(version => {
