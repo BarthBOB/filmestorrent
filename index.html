@@ -715,8 +715,8 @@
          */
         function isSeriesVersion(version) {
             const versionText = version.Versão || '';
-            // Exemplos de padrões para séries: S01E01, T01E01, Temporada 1 Episódio 1
-            return /(S\d{2}E\d{2}|T\d{2}E\d{2}|Temporada \d+ Episódio \d+)/i.test(versionText);
+            // Exemplos de padrões para séries: S01E01, T01E01, Temporada 1 Episódio 1, Episódio X
+            return /(S\d{2}E\d{2}|T\d{2}E\d{2}|Temporada \d+ Episódio \d+|Episódio \d+)/i.test(versionText);
         }
 
         /**
@@ -976,13 +976,14 @@
          * @returns {string} O HTML do item de versão.
          */
         function createVersionItemHTML(version, index, isSeries) {
-            // ALTERAÇÃO AQUI: Mudando o IP público para localhost
-            const localServerBaseUrl = "http://localhost:27016"; 
+            // Base URL para o seu servidor local que lida com torrents.
+            // A porta foi removida para que o navegador tente a porta padrão (80 para HTTP).
+            const localServerBaseUrl = "http://localhost"; 
             let watchButtonHtml = '';
 
             if (version.Magnet) {
                 if (isSeries) {
-                    // Para séries, o botão abre a seleção de arquivos
+                    // Para séries, o botão abre a seleção de arquivos/episódios
                     watchButtonHtml = `<button class="download-btn secondary select-file-btn" data-magnet="${encodeURIComponent(version.Magnet)}" data-version-index="${index}">▶️ Selecionar Episódio</button>`;
                 } else {
                     // Para filmes únicos, o botão "Assistir" funciona como antes
@@ -1072,7 +1073,7 @@
             //              fileButton.className = 'file-item-btn';
             //              fileButton.innerHTML = `<span>${fileName}</span> <span class="play-icon">▶️</span>`;
             //              fileButton.addEventListener('click', () => {
-            //                  const localServerBaseUrl = "http://localhost:27016"; // ALTERAÇÃO AQUI
+            //                  const localServerBaseUrl = "http://localhost"; // Base URL para o seu servidor local
             //                  const watchUrl = `${localServerBaseUrl}/?magnet=${encodeURIComponent(magnetLink)}&fileName=${encodeURIComponent(fileName)}`;
             //                  window.open(watchUrl, '_blank');
             //              });
@@ -1096,8 +1097,8 @@
                     fileButton.className = 'file-item-btn';
                     fileButton.innerHTML = `<span>${fileName}</span> <span class="play-icon">▶️</span>`;
                     fileButton.addEventListener('click', () => {
-                        // ALTERAÇÃO AQUI: Mudando o IP público para localhost
-                        const localServerBaseUrl = "http://localhost:27016"; 
+                        // Base URL para o seu servidor local que lida com torrents
+                        const localServerBaseUrl = "http://localhost"; 
                         // A URL final que seu servidor precisaria entender para reproduzir um arquivo específico
                         const watchUrl = `${localServerBaseUrl}/?magnet=${encodeURIComponent(magnetLink)}&fileName=${encodeURIComponent(fileName)}`;
                         window.open(watchUrl, '_blank');
