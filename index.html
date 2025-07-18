@@ -696,13 +696,6 @@
         const modalSynopsis = document.getElementById('modal-synopsis');
         const modalVersions = document.getElementById('modal-versions');
 
-        // Determina a base URL do servidor de torrents dinamicamente
-        // Se estiver em localhost ou 127.0.0.1, usa 'http://localhost'
-        // Caso contrário, usa a origem atual (protocolo + hostname + porta, se não for padrão)
-        const localServerBaseUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-            ? "http://localhost"
-            : window.location.origin;
-
         /**
          * Limpa o título do filme removendo sufixos de torrent e informações entre parênteses.
          * @param {string} title O título original do filme.
@@ -983,6 +976,9 @@
          * @returns {string} O HTML do item de versão.
          */
         function createVersionItemHTML(version, index, isSeries) {
+            // Base URL para o seu servidor local que lida com torrents.
+            // A porta foi removida para que o navegador tente a porta padrão (80 para HTTP).
+            const localServerBaseUrl = "http://localhost"; 
             let watchButtonHtml = '';
 
             if (version.Magnet) {
@@ -1077,6 +1073,7 @@
             //              fileButton.className = 'file-item-btn';
             //              fileButton.innerHTML = `<span>${fileName}</span> <span class="play-icon">▶️</span>`;
             //              fileButton.addEventListener('click', () => {
+            //                  const localServerBaseUrl = "http://localhost"; // Base URL para o seu servidor local
             //                  const watchUrl = `${localServerBaseUrl}/?magnet=${encodeURIComponent(magnetLink)}&fileName=${encodeURIComponent(fileName)}`;
             //                  window.open(watchUrl, '_blank');
             //              });
@@ -1100,6 +1097,8 @@
                     fileButton.className = 'file-item-btn';
                     fileButton.innerHTML = `<span>${fileName}</span> <span class="play-icon">▶️</span>`;
                     fileButton.addEventListener('click', () => {
+                        // Base URL para o seu servidor local que lida com torrents
+                        const localServerBaseUrl = "http://localhost"; 
                         // A URL final que seu servidor precisaria entender para reproduzir um arquivo específico
                         const watchUrl = `${localServerBaseUrl}/?magnet=${encodeURIComponent(magnetLink)}&fileName=${encodeURIComponent(fileName)}`;
                         window.open(watchUrl, '_blank');
