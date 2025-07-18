@@ -696,10 +696,12 @@
         const modalSynopsis = document.getElementById('modal-synopsis');
         const modalVersions = document.getElementById('modal-versions');
 
-        // A BASE_URL será injetada pelo backend.
-        // Se o backend não injetar (ex: ao abrir o HTML diretamente),
-        // tentaremos inferir do window.location.origin
-        const BASE_URL = window.location.origin; // Default to current origin
+        // Determina a base URL do servidor de torrents dinamicamente
+        // Se estiver em localhost ou 127.0.0.1, usa 'http://localhost'
+        // Caso contrário, usa a origem atual (protocolo + hostname + porta, se não for padrão)
+        const localServerBaseUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? "http://localhost"
+            : window.location.origin;
 
         /**
          * Limpa o título do filme removendo sufixos de torrent e informações entre parênteses.
@@ -989,8 +991,7 @@
                     watchButtonHtml = `<button class="download-btn secondary select-file-btn" data-magnet="${encodeURIComponent(version.Magnet)}" data-version-index="${index}">▶️ Selecionar Episódio</button>`;
                 } else {
                     // Para filmes únicos, o botão "Assistir" funciona como antes
-                    // Usa a BASE_URL dinâmica
-                    const watchUrl = `${BASE_URL}/?magnet=${encodeURIComponent(version.Magnet)}`;
+                    const watchUrl = `${localServerBaseUrl}/?magnet=${encodeURIComponent(version.Magnet)}`;
                     watchButtonHtml = `<a href="${watchUrl}" target="_blank" class="download-btn secondary">▶️ Assistir</a>`;
                 }
             }
@@ -1045,45 +1046,68 @@
         }
 
         /**
-         * Obtém e renderiza uma lista de arquivos de um torrent.
-         * Esta função fará uma chamada à sua API local.
+         * Simula a obtenção de uma lista de arquivos de um torrent e os renderiza.
+         * EM UM CENÁRIO REAL, ESTA FUNÇÃO FARIA UMA CHAMADA À SUA API LOCAL.
          * @param {string} magnetLink O link magnet do torrent.
          * @param {number} versionIndex O índice da versão do filme.
          */
-        async function populateEpisodeList(magnetLink, versionIndex) {
+        function populateEpisodeList(magnetLink, versionIndex) {
             const fileListContainer = document.getElementById(`file-list-${versionIndex}`);
             fileListContainer.innerHTML = '<p style="color: #a0a0a0; font-style: italic;">Carregando arquivos...</p>'; // Loading message
 
-            try {
-                // Usa a BASE_URL dinâmica para a chamada à API
-                const response = await fetch(`${BASE_URL}/list-videos?magnet=${encodeURIComponent(magnetLink)}`);
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Erro ao listar arquivos: ${errorText}`);
-                }
-                const files = await response.json();
+            // Simulação de arquivos de torrent (substitua por uma chamada real à API)
+            const simulatedFiles = [
+                `Episódio 01 - Nome do Episódio.mp4`,
+                `Episódio 02 - Outro Episódio.mp4`,
+                `Episódio 03 - Final da Temporada.mp4`,
+                `Episódio 04 - Bônus.mp4`
+            ];
 
-                fileListContainer.innerHTML = ''; // Clear loading message
-                if (files.length === 0) {
+            // Em um ambiente real, você faria algo como:
+            // fetch(`${localServerBaseUrl}/list-files?magnet=${encodeURIComponent(magnetLink)}`)
+            //      .then(response => response.json())
+            //      .then(files => {
+            //          fileListContainer.innerHTML = ''; // Clear loading message
+            //          if (files.length === 0) {
+            //              fileListContainer.innerHTML = '<p style="color: #a0a0a0;">Nenhum arquivo de vídeo encontrado neste torrent.</p>';
+            //              return;
+            //          }
+            //          files.forEach(fileName => {
+            //              const fileButton = document.createElement('button');
+            //              fileButton.className = 'file-item-btn';
+            //              fileButton.innerHTML = `<span>${fileName}</span> <span class="play-icon">▶️</span>`;
+            //              fileButton.addEventListener('click', () => {
+            //                  const watchUrl = `${localServerBaseUrl}/?magnet=${encodeURIComponent(magnetLink)}&fileName=${encodeURIComponent(fileName)}`;
+            //                  window.open(watchUrl, '_blank');
+            //              });
+            //              fileListContainer.appendChild(fileButton);
+            //          });
+            //      })
+            //      .catch(error => {
+            //          console.error('Erro ao listar arquivos do torrent:', error);
+            //          fileListContainer.innerHTML = '<p style="color: #ff6b6b;">Erro ao carregar arquivos.</p>';
+            //      });
+
+            // Usando os arquivos simulados para demonstração:
+            setTimeout(() => { // Simula um pequeno atraso de rede
+                fileListContainer.innerHTML = ''; // Limpa a mensagem de carregamento
+                if (simulatedFiles.length === 0) {
                     fileListContainer.innerHTML = '<p style="color: #a0a0a0;">Nenhum arquivo de vídeo encontrado neste torrent.</p>';
                     return;
                 }
-                files.forEach(file => {
+                simulatedFiles.forEach(fileName => {
                     const fileButton = document.createElement('button');
                     fileButton.className = 'file-item-btn';
-                    fileButton.innerHTML = `<span>${file.name} (${(file.length / (1024 * 1024)).toFixed(2)} MB)</span> <span class="play-icon">▶️</span>`;
+                    fileButton.innerHTML = `<span>${fileName}</span> <span class="play-icon">▶️</span>`;
                     fileButton.addEventListener('click', () => {
-                        // Usa a BASE_URL dinâmica para a URL de reprodução
-                        const watchUrl = `${BASE_URL}/?magnet=${encodeURIComponent(magnetLink)}&fileName=${encodeURIComponent(file.name)}`;
+                        // A URL final que seu servidor precisaria entender para reproduzir um arquivo específico
+                        const watchUrl = `${localServerBaseUrl}/?magnet=${encodeURIComponent(magnetLink)}&fileName=${encodeURIComponent(fileName)}`;
                         window.open(watchUrl, '_blank');
-                        console.log(`Tentando assistir: ${file.name} do torrent: ${magnetLink}`);
+                        console.log(`Tentando assistir: ${fileName} do torrent: ${magnetLink}`);
                     });
                     fileListContainer.appendChild(fileButton);
                 });
-            } catch (error) {
-                console.error('Erro ao listar arquivos do torrent:', error);
-                fileListContainer.innerHTML = `<p style="color: #ff6b6b;">Erro ao carregar arquivos: ${error.message}</p>`;
-            }
+            }, 500); // Atraso de 0.5 segundos
         }
 
 
@@ -1103,7 +1127,7 @@
                 
                 // Verifica se o título ou a sinopse de alguma versão corresponde ao termo de busca
                 const matchesSearch = title.toLowerCase().includes(searchTerm) ||
-                                      versions.some(v => v.Sinopse && v.Sinopse.toLowerCase().includes(searchTerm));
+                                     versions.some(v => v.Sinopse && v.Sinopse.toLowerCase().includes(searchTerm));
                 
                 // Verifica se alguma versão corresponde aos filtros selecionados
                 const matchesFilters = versions.some(version => {
